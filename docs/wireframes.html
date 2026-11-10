@@ -1,0 +1,523 @@
+<title>ひびログ ワイヤーフレーム</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a review sheet. Real-size 375x667 screens on a quiet desk, grouped by task, each with its spec notes and a measured fit badge. */
+:root {
+  --desk: #EDF1F0;
+  --ink: #1E2422;
+  --muted: #56615E;
+  --line: #CBD4D2;
+  --accent: #1F6F6B;
+  --ok: #1F6F6B;
+  --warn: #9A4A12;
+  --font-display: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #141918; --ink: #E3EAE8; --muted: #9AA7A4; --line: #2E3836;
+    --accent: #72C3BB; --ok: #72C3BB; --warn: #E8A06A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #141918; --ink: #E3EAE8; --muted: #9AA7A4; --line: #2E3836;
+  --accent: #72C3BB; --ok: #72C3BB; --warn: #E8A06A; color-scheme: dark;
+}
+
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  padding-block: 40px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+.intro { display: flex; flex-direction: column; gap: 12px; max-width: 68ch; }
+.intro h1 { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.3; margin: 0; text-wrap: balance; }
+.intro p { margin: 0; color: var(--muted); }
+.meta { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 20px 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+.legend .lg { display: flex; flex-direction: column; gap: 8px; }
+.legend h3, section > h2 { font-family: var(--font-display); font-weight: 700; margin: 0; }
+.legend h3 { font-size: 13px; letter-spacing: .06em; color: var(--muted); }
+.lg-row { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; }
+.lg-row .item { display: inline-flex; gap: 6px; align-items: center; }
+.lg-swatch { display: inline-flex; gap: 3px; }
+.legend .mk { color: var(--ink); }
+
+section { display: flex; flex-direction: column; gap: 24px; }
+section > h2 { font-size: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.frames { display: flex; flex-wrap: wrap; gap: 48px 40px; align-items: flex-start; }
+figure { margin: 0; width: 375px; max-width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.scroller { overflow-x: auto; max-width: 100%; }
+figcaption { display: flex; flex-direction: column; gap: 6px; }
+.fid { font-family: var(--font-mono); font-size: 12px; letter-spacing: .05em; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.fname { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+figcaption ul { margin: 0; padding-left: 1.2em; font-size: 13.5px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+.fit { font-family: var(--font-mono); font-size: 12px; }
+.fit.ok { color: var(--ok); }
+.fit.over { color: var(--warn); }
+
+/* ---------- App screen (light only, per Surface Q30) ---------- */
+.screen {
+  --a-bg: #FAF8F5; --a-surface: #FFFFFF; --a-ink: #2B2A28; --a-muted: #69645C;
+  --a-line: #C9C3B8; --a-divider: #E4E0D9; --a-accent: #1F6F6B; --a-today: #E3F1EF;
+  --a-danger: #B3362B; --a-mark: #4F4B45;
+  color-scheme: light;
+  width: 375px; height: 667px; flex: none;
+  background: var(--a-bg); color: var(--a-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 16px; line-height: 1.4;
+  display: flex; flex-direction: column; position: relative; overflow: hidden;
+  border-radius: 6px; box-shadow: 0 0 0 1px var(--line), 0 12px 32px -18px rgba(0,0,0,.35);
+}
+.screen * { box-sizing: border-box; }
+.sb { height: 20px; flex: none; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.main { flex: 1; overflow-y: auto; min-height: 0; }
+.bar { height: 60px; flex: none; display: flex; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--a-divider); background: var(--a-bg); }
+.btn { flex: 1; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600; }
+.btn.pri { background: var(--a-accent); color: #FFFFFF; }
+.btn.out { background: var(--a-surface); color: var(--a-accent); box-shadow: inset 0 0 0 1.5px var(--a-accent); font-size: 15px; }
+.btn.grow2 { flex: 2; }
+
+.hd { flex: none; display: flex; align-items: center; border-bottom: 1px solid var(--a-divider); padding: 0 12px; }
+.hd.cal { height: 52px; gap: 4px; }
+.hd.frm { height: 44px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; }
+.hl { color: var(--a-accent); font-size: 16px; justify-self: start; }
+.hc { font-size: 16px; font-weight: 600; }
+.hr { justify-self: end; font-size: 16px; }
+.hr.danger { color: var(--a-danger); }
+
+.seg { display: flex; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--a-accent); overflow: hidden; }
+.seg span { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--a-accent); }
+.seg span + span { border-left: 1px solid var(--a-accent); }
+.seg span.on { background: var(--a-accent); color: #FFFFFF; }
+.seg.sm { width: 84px; height: 32px; font-size: 14px; font-weight: 600; flex: none; }
+.nav { flex: 1; display: flex; align-items: center; justify-content: center; }
+.arw { width: 32px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--a-accent); }
+.rng { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 84px; text-align: center; }
+.today-btn { font-size: 14px; color: var(--a-accent); padding: 0 6px; }
+.ico { width: 36px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--a-muted); }
+
+/* week rows */
+.row { display: grid; grid-template-columns: 44px 44px 1fr; gap: 0 8px; padding: 8px 12px; min-height: 52px; border-bottom: 1px solid var(--a-divider); align-items: start; }
+.row.today { background: var(--a-today); box-shadow: inset 3px 0 0 var(--a-accent); }
+.row.future { opacity: .4; }
+.dt { display: flex; flex-direction: column; align-items: center; line-height: 1.1; padding-top: 1px; }
+.wd { font-size: 12px; color: var(--a-muted); }
+.dn { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.row.today .dn { color: var(--a-accent); }
+.stl { display: flex; flex-wrap: wrap; gap: 3px 4px; align-content: flex-start; padding-top: 3px; }
+.fd { display: flex; flex-wrap: wrap; gap: 3px; align-content: flex-start; }
+.none { font-size: 13px; color: var(--a-muted); line-height: 24px; }
+.t { width: 24px; height: 24px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; line-height: 1; flex: none; }
+.t.gs { margin-left: 4px; }
+.staple { background: #F6E3B4; color: #5F4200; }
+.protein { background: #F8D3CF; color: #7A1D18; }
+.vegetable { background: #CFE8CC; color: #1B5527; }
+.other { background: #454B57; color: #FFFFFF; }
+.sweets { background: #E7D8F6; color: #55278A; }
+.mk { color: var(--a-mark); flex: none; display: block; }
+.toast { position: absolute; left: 50%; bottom: 72px; transform: translateX(-50%); background: #2B2A28; color: #FFFFFF; font-size: 14px; padding: 8px 18px; border-radius: 20px; box-shadow: 0 6px 16px -6px rgba(0,0,0,.4); white-space: nowrap; }
+
+/* month */
+.mwd { display: grid; grid-template-columns: repeat(7, 1fr); height: 20px; font-size: 11px; color: var(--a-muted); text-align: center; padding: 0 12px; align-items: center; border-bottom: 1px solid var(--a-divider); }
+.mgrid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 12px; }
+.mc { height: 64px; border-bottom: 1px solid var(--a-divider); display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; }
+.mc .md { font-size: 13px; font-variant-numeric: tabular-nums; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.mc.today .md { background: var(--a-accent); color: #FFFFFF; font-weight: 700; }
+.mc.om .md { color: var(--a-muted); }
+.mc.om .mk { opacity: .55; }
+.mc.future { opacity: .4; }
+.mm { display: flex; flex-wrap: wrap; gap: 2px; width: 46px; justify-content: center; }
+
+/* day detail */
+.sh { font-size: 12px; font-weight: 600; color: var(--a-muted); padding: 14px 12px 6px; letter-spacing: .04em; }
+.list { background: var(--a-surface); border-top: 1px solid var(--a-divider); }
+.dr { display: grid; grid-template-columns: 96px 1fr 12px; gap: 8px; align-items: center; min-height: 44px; padding: 9px 12px; border-bottom: 1px solid var(--a-divider); font-size: 15px; }
+.dr .lb { font-weight: 600; }
+.dr .tm { font-variant-numeric: tabular-nums; color: var(--a-muted); }
+.dr .vl.muted { color: var(--a-muted); }
+.dr .chev { color: var(--a-muted); font-size: 18px; }
+.dr .stv { display: flex; gap: 8px; align-items: center; }
+.add { min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: var(--a-accent); font-size: 15px; border-bottom: 1px solid var(--a-divider); }
+
+/* meal form */
+.slot { flex: none; height: 48px; padding: 6px 12px; }
+.slot .seg { height: 36px; font-size: 13px; font-weight: 600; }
+.slot.fixed { display: flex; align-items: center; font-size: 16px; font-weight: 600; gap: 8px; }
+.slot.fixed small { font-size: 12px; font-weight: 400; color: var(--a-muted); }
+.inner { padding: 0 12px 4px; }
+.grp + .grp { margin-top: 0; }
+.gh { height: 18px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--a-muted); }
+.sw { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding-bottom: 4px; }
+.chip { all: unset; box-sizing: border-box; height: 40px; border-radius: 8px; background: var(--a-surface); box-shadow: inset 0 0 0 1px var(--a-line); color: var(--a-ink); font: 500 15px/1.15 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; display: flex; align-items: center; justify-content: center; gap: 3px; text-align: center; cursor: pointer; }
+.chip.on { background: var(--a-accent); color: #FFFFFF; box-shadow: none; }
+.chip.on::before { content: "✓"; font-size: 13px; }
+.chip:focus-visible { outline: 2px solid var(--a-accent); outline-offset: 2px; }
+
+/* stool form */
+.fl { font-size: 12px; font-weight: 600; color: var(--a-muted); padding: 14px 0 6px; }
+.fl small { font-weight: 400; }
+.shapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.shape { height: 64px; flex-direction: column; gap: 4px; font-size: 14px; }
+.shape.on::before { content: none; }
+.inner .seg { height: 40px; font-size: 15px; }
+.dtrow { display: flex; gap: 8px; }
+.inp { height: 40px; border-radius: 8px; background: var(--a-surface); box-shadow: inset 0 0 0 1px var(--a-line); display: flex; align-items: center; padding: 0 12px; font-size: 16px; font-variant-numeric: tabular-nums; flex: 1; }
+
+/* sheet */
+.dim { position: absolute; inset: 0; background: rgba(30,28,26,.42); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--a-surface); border-radius: 16px 16px 0 0; padding: 20px 12px 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -8px 24px -12px rgba(0,0,0,.3); }
+.sheet p { margin: 0 0 8px; text-align: center; font-size: 15px; }
+.btn.del { background: var(--a-danger); color: #FFFFFF; flex: none; }
+.btn.plain { background: var(--a-surface); color: var(--a-ink); box-shadow: inset 0 0 0 1px var(--a-line); flex: none; }
+
+/* category mgmt */
+.cr { display: grid; grid-template-columns: 24px 1fr 12px; gap: 12px; align-items: center; min-height: 44px; padding: 0 12px; border-bottom: 1px solid var(--a-divider); font-size: 15px; background: var(--a-surface); }
+.cr .chev { color: var(--a-muted); font-size: 18px; }
+.cr.off { color: var(--a-muted); }
+.cr.off .t { opacity: .5; }
+
+/* category edit */
+.frow { display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 8px; min-height: 56px; border-bottom: 1px solid var(--a-divider); font-size: 15px; }
+.frow .inp { flex: none; }
+.abbr { width: 48px; justify-content: center; font-weight: 700; }
+.sel { justify-content: space-between; }
+.tgl { width: 51px; height: 31px; border-radius: 16px; background: var(--a-accent); position: relative; }
+.tgl::after { content: ""; position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 50%; background: #FFFFFF; }
+.note { font-size: 13px; color: var(--a-muted); padding-top: 12px; }
+
+/* login */
+.login { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 0 28px 60px; }
+.appicon { width: 64px; height: 64px; border-radius: 14px; background: var(--a-accent); align-self: center; display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 0 14px; }
+.appicon i { height: 4px; border-radius: 2px; background: #FFFFFF; display: block; }
+.appicon i:nth-child(2) { width: 70%; }
+.appicon i:nth-child(3) { width: 45%; }
+.appname { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 20px; }
+.login .inp { flex: none; color: var(--a-muted); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="st-hard" viewBox="0 0 18 18"><circle cx="5" cy="12" r="3.2" fill="currentColor"/><circle cx="13" cy="12" r="3.2" fill="currentColor"/><circle cx="9" cy="5" r="3.2" fill="currentColor"/></symbol>
+  <symbol id="st-normal" viewBox="0 0 18 18"><ellipse cx="9" cy="9" rx="8" ry="5" fill="currentColor"/></symbol>
+  <symbol id="st-soft" viewBox="0 0 18 18"><circle cx="6" cy="10.5" r="4" fill="currentColor"/><circle cx="10.5" cy="8.5" r="4.5" fill="currentColor"/><circle cx="14" cy="11.5" r="3" fill="currentColor"/><rect x="2" y="11" width="15" height="3.5" rx="1.5" fill="currentColor"/></symbol>
+  <symbol id="st-diarrhea" viewBox="0 0 18 18"><path d="M9 1.5C9 1.5 3.5 8.2 3.5 11.3a5.5 5.5 0 0 0 11 0C14.5 8.2 9 1.5 9 1.5Z" fill="currentColor"/></symbol>
+  <symbol id="ic-slider" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<main class="page">
+  <header class="intro">
+    <h1>ひびログ ワイヤーフレーム</h1>
+    <p>各画面は iPhone SE3 の実寸（375×667px）で描いています。上端の20pxは、ホーム画面から起動したときのステータスバーです。色と寸法は Surface・Skeleton の決定値どおりで、データはすべて表示確認用の例です。</p>
+    <p>各画面の「縦の収まり」は、このブラウザで実際に測った値です。書体の違いで実機と数px異なることがあります。食事記録のカテゴリは、タップで選択を切り替えられます。</p>
+    <div class="meta"><span>基準 iPhone SE3 375×667</span><span>今日 = 2026-11-10（火）</span><span>docs/02〜05 に準拠</span></div>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <section>
+    <h2>カレンダー</h2>
+    <div class="frames">
+      <figure><div class="scroller" id="f-week-now"></div><figcaption>
+        <div class="fid"><span>S-02 週表示</span><span class="fit" data-for="f-week-now"></span></div>
+        <div class="fname">起動直後（今日を含む週）</div>
+        <ul><li>今日の行を背景と左端の線で強調し、未来の日は薄くして選べなくする</li><li>下部の「食事」「便」から1タップで記録を始める</li><li>保存後は記録バーの上にトーストを約2秒表示する</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-week-prev"></div><figcaption>
+        <div class="fid"><span>S-02 週表示</span><span class="fit" data-for="f-week-prev"></span></div>
+        <div class="fname">記録が揃った週（前の週）</div>
+        <ul><li>カテゴリ印はグループ順に並べ、グループの間に隙間を入れる。濃色の「その他」（揚・乳・辛・酒・コ）が目に留まる</li><li>便は回数分を並べ、2つで折り返す（11/8 は3回）</li><li>記録が1件もない日は「未記録」と示す（11/5）</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-month"></div><figcaption>
+        <div class="fid"><span>S-02 月表示</span><span class="fit" data-for="f-month"></span></div>
+        <div class="fname">月表示</div>
+        <ul><li>セルには日付と便マークのみを置く</li><li>今日は日付を円で囲む。前月の日は日付を薄くする</li><li>日付を選ぶと日別詳細に進む</li></ul>
+      </figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>記録</h2>
+    <div class="frames">
+      <figure><div class="scroller" id="f-meal"></div><figcaption>
+        <div class="fid"><span>S-04 食事記録・新規</span><span class="fit" data-for="f-meal"></span></div>
+        <div class="fname">昼食を記録する</div>
+        <ul><li>12:30 に開いたため、昼食が自動で選ばれている</li><li>カテゴリは4列の格子で位置を固定する</li><li>「前回をコピー」は保存の左。前回の昼食があるときのみ出る</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-snack"></div><figcaption>
+        <div class="fid"><span>S-04 食事記録・新規</span><span class="fit" data-for="f-snack"></span></div>
+        <div class="fname">間食を記録する</div>
+        <ul><li>「食事」で開始し、上部で「その他の食事」を選ぶ</li><li>その他の食事にはコピーがないため、保存を全幅にする</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-stool"></div><figcaption>
+        <div class="fid"><span>S-06 便記録・新規</span><span class="fit" data-for="f-stool"></span></div>
+        <div class="fname">便を記録する</div>
+        <ul><li>形状の選択肢に便マークを添え、記録のたびにマークの意味を覚えられるようにする</li><li>量と排便感は任意。選択中をもう一度タップすると解除できる</li><li>時刻は保存時に自動で記録する</li></ul>
+      </figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>確認と修正</h2>
+    <div class="frames">
+      <figure><div class="scroller" id="f-day"></div><figcaption>
+        <div class="fid"><span>S-03 日別詳細</span><span class="fit" data-for="f-day"></span></div>
+        <div class="fname">11月9日の詳細</div>
+        <ul><li>朝食・昼食・夕食は記録がなくても枠を示す</li><li>カテゴリは略称ではなく正式名称で示す</li><li>行を選ぶと編集、「＋」でその日に追加する</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-edit"></div><figcaption>
+        <div class="fid"><span>S-04 食事記録・編集</span><span class="fit" data-for="f-edit"></span></div>
+        <div class="fname">記録の削除</div>
+        <ul><li>編集時は食事枠を変更できないため、枠名だけを示す</li><li>「削除」はヘッダーの右。保存ボタンから離す</li><li>削除は下からのシートで確認してから実行する</li></ul>
+      </figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>管理とログイン</h2>
+    <div class="frames">
+      <figure><div class="scroller" id="f-cats"></div><figcaption>
+        <div class="fid"><span>S-07 カテゴリ管理</span><span class="fit" data-for="f-cats"></span></div>
+        <div class="fname">カテゴリ管理</div>
+        <ul><li>グループごとに一覧し、縦にスクロールする</li><li>「使わない」カテゴリは末尾にまとめる（「そば」は表示例）</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-catedit"></div><figcaption>
+        <div class="fid"><span>S-08 カテゴリ編集</span><span class="fit" data-for="f-catedit"></span></div>
+        <div class="fname">揚げ物を編集する</div>
+        <ul><li>略称はカレンダーのカテゴリ印に使う1文字</li><li>名称の変更が過去の記録にも反映されることを示す</li></ul>
+      </figcaption></figure>
+
+      <figure><div class="scroller" id="f-login"></div><figcaption>
+        <div class="fid"><span>S-01 ログイン</span><span class="fit" data-for="f-login"></span></div>
+        <div class="fname">ログイン</div>
+        <ul><li>メールアドレスとパスワード。端末のパスワード管理機能で入力を省ける</li><li>アイコンと名前から記録の内容がわからないようにする</li></ul>
+      </figcaption></figure>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var GROUPS = [
+    ["staple", "主食", [["米","米"],["パン","パ"],["麺","麺"]]],
+    ["protein", "肉・魚・卵", [["豚肉","豚"],["鶏肉","鶏"],["牛肉","牛"],["魚","魚"],["卵","卵"],["大豆製品","豆"]]],
+    ["vegetable", "野菜・果物", [["野菜","野"],["海藻","海"],["きのこ","茸"],["果物","果"]]],
+    ["other", "その他", [["揚げ物","揚"],["乳製品","乳"],["辛いもの","辛"],["お酒","酒"],["コーヒー","コ"]]],
+    ["sweets", "お菓子", [["ポテチ","ポ"],["グミ","グ"],["チョコ","チ"],["せんべい","せ"],["アイス","ア"],["菓子パン","菓"],["クッキー","ク"],["その他","他"]]]
+  ];
+  var CODE = { s: 0, p: 1, v: 2, o: 3, w: 4 };
+  var SHAPES = [["hard","硬い"],["normal","普通"],["soft","柔らかい"],["diarrhea","下痢"]];
+  var SHAPE_LABEL = { hard: "硬い", normal: "普通", soft: "柔らかい", diarrhea: "下痢" };
+
+  function parse(code) {
+    var gi = CODE[code.charAt(0)], name = code.slice(2), items = GROUPS[gi][2];
+    for (var i = 0; i < items.length; i++) if (items[i][0] === name) return { gi: gi, ii: i, name: name, abbr: items[i][1] };
+    throw new Error("unknown " + code);
+  }
+  function tiles(list) {
+    var p = list.map(parse).sort(function (a, b) { return a.gi - b.gi || a.ii - b.ii; });
+    var prev = -1;
+    return p.map(function (x) {
+      var gs = prev !== -1 && prev !== x.gi ? " gs" : "";
+      prev = x.gi;
+      return '<span class="t ' + GROUPS[x.gi][0] + gs + '" title="' + GROUPS[x.gi][1] + "：" + x.name + '">' + x.abbr + "</span>";
+    }).join("");
+  }
+  function mark(type, size) {
+    return '<svg class="mk" width="' + size + '" height="' + size + '" viewBox="0 0 18 18" role="img" aria-label="' + SHAPE_LABEL[type] + '"><use href="#st-' + type + '"/></svg>';
+  }
+  function sb(t) { return '<div class="sb">' + t + "</div>"; }
+  function calHeader(mode, range) {
+    return '<div class="hd cal"><div class="seg sm"><span class="' + (mode === "w" ? "on" : "") + '">週</span><span class="' + (mode === "m" ? "on" : "") + '">月</span></div>' +
+      '<div class="nav"><span class="arw">‹</span><span class="rng">' + range + '</span><span class="arw">›</span></div>' +
+      '<span class="today-btn">今日</span><span class="ico" aria-label="カテゴリ管理"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#ic-slider"/></svg></span></div>';
+  }
+  var recBar = '<div class="bar"><span class="btn pri">食事</span><span class="btn pri">便</span></div>';
+  function frmHeader(l, c, r, rcls) {
+    return '<div class="hd frm"><span class="hl">' + l + '</span><span class="hc">' + c + '</span><span class="hr ' + (rcls || "") + '">' + (r || "") + "</span></div>";
+  }
+  function screen(inner) { return '<div class="screen">' + inner + "</div>"; }
+
+  function week(days, range, toast) {
+    var rows = days.map(function (d) {
+      var cls = d.today ? " today" : d.future ? " future" : "";
+      var st = (d.st || []).map(function (s) { return mark(s, 18); }).join("");
+      var f = d.f && d.f.length ? tiles(d.f) : (d.future ? "" : '<span class="none">未記録</span>');
+      return '<div class="row' + cls + '"><div class="dt"><span class="wd">' + d.w + '</span><span class="dn">' + d.d + '</span></div><div class="stl">' + st + '</div><div class="fd">' + f + "</div></div>";
+    }).join("");
+    return screen(sb("12:31") + calHeader("w", range) + '<div class="main"><div class="fitbox">' + rows + "</div></div>" + recBar + (toast ? '<div class="toast">記録しました</div>' : ""));
+  }
+
+  var prevWeek = [
+    { w: "月", d: 2, st: ["normal"], f: ["s:米","s:パン","p:豚肉","p:卵","v:野菜","o:乳製品","o:コーヒー","w:チョコ"] },
+    { w: "火", d: 3, st: ["hard"], f: ["s:米","s:麺","p:鶏肉","p:魚","v:野菜","v:海藻","o:揚げ物","o:お酒","w:ポテチ","w:アイス"] },
+    { w: "水", d: 4, st: ["normal","normal"], f: ["s:パン","s:米","p:卵","p:豚肉","v:野菜","v:きのこ","v:果物","o:コーヒー"] },
+    { w: "木", d: 5, st: [], f: [] },
+    { w: "金", d: 6, st: ["soft"], f: ["s:米","s:麺","p:牛肉","p:大豆製品","v:野菜","o:揚げ物","o:辛いもの","o:お酒","o:乳製品","w:せんべい","w:グミ","w:菓子パン"] },
+    { w: "土", d: 7, st: ["normal"], f: ["s:パン","s:米","p:卵","p:鶏肉","v:野菜","v:海藻","v:果物","o:揚げ物","o:乳製品","o:コーヒー","w:クッキー","w:チョコ"] },
+    { w: "日", d: 8, st: ["diarrhea","soft","normal"], f: ["s:麺","p:豚肉","v:野菜","o:辛いもの"] }
+  ];
+  var nowWeek = [
+    { w: "月", d: 9, st: ["normal"], f: ["s:パン","s:米","p:卵","p:豚肉","v:野菜","v:きのこ","o:揚げ物","o:乳製品","o:コーヒー","w:チョコ","w:アイス"] },
+    { w: "火", d: 10, today: true, st: ["normal"], f: ["s:パン","p:卵","o:乳製品","o:コーヒー"] },
+    { w: "水", d: 11, future: true }, { w: "木", d: 12, future: true }, { w: "金", d: 13, future: true },
+    { w: "土", d: 14, future: true }, { w: "日", d: 15, future: true }
+  ];
+
+  function month() {
+    var stools = { "10-26": ["normal"], "10-27": ["hard"], "10-28": ["normal"], "10-30": ["soft"], "10-31": ["normal"], "11-1": ["normal","soft"],
+      "11-2": ["normal"], "11-3": ["hard"], "11-4": ["normal","normal"], "11-6": ["soft"], "11-7": ["normal"], "11-8": ["diarrhea","soft","normal"],
+      "11-9": ["normal"], "11-10": ["normal"] };
+    var cells = [], m = 10, d = 26;
+    for (var i = 0; i < 42; i++) {
+      var key = m + "-" + d, cls = "mc";
+      if (m === 10) cls += " om";
+      if (m === 11 && d === 10) cls += " today";
+      if ((m === 11 && d > 10) || m === 12) cls += " future";
+      var mk = (stools[key] || []).map(function (s) { return mark(s, 14); }).join("");
+      cells.push('<div class="' + cls + '"><span class="md">' + d + '</span><div class="mm">' + mk + "</div></div>");
+      d++;
+      if (m === 10 && d > 31) { m = 11; d = 1; } else if (m === 11 && d > 30) { m = 12; d = 1; }
+    }
+    var wd = '<div class="mwd">' + ["月","火","水","木","金","土","日"].map(function (x) { return "<span>" + x + "</span>"; }).join("") + "</div>";
+    return screen(sb("12:31") + calHeader("m", "2026年11月") + '<div class="main"><div class="fitbox">' + wd + '<div class="mgrid">' + cells.join("") + "</div></div></div>" + recBar);
+  }
+
+  function chipGroups(selected) {
+    return GROUPS.map(function (g) {
+      var chips = g[2].map(function (it) {
+        var on = selected.indexOf(g[0] + ":" + it[0]) !== -1;
+        return '<button type="button" class="chip' + (on ? " on" : "") + '" aria-pressed="' + on + '">' + it[0] + "</button>";
+      }).join("");
+      return '<div class="grp"><div class="gh"><i class="sw ' + g[0] + '"></i>' + g[1] + '</div><div class="chips">' + chips + "</div></div>";
+    }).join("");
+  }
+  function slotSeg(active) {
+    return '<div class="slot"><div class="seg">' + ["朝食","昼食","夕食","その他の食事"].map(function (s) {
+      return '<span class="' + (s === active ? "on" : "") + '">' + s + "</span>";
+    }).join("") + "</div></div>";
+  }
+  function meal() {
+    return screen(sb("12:30") + frmHeader("キャンセル", "11月10日（火）") + slotSeg("昼食") +
+      '<div class="main"><div class="inner fitbox">' + chipGroups(["staple:米","protein:豚肉","vegetable:野菜","vegetable:きのこ"]) + "</div></div>" +
+      '<div class="bar"><span class="btn out">前回をコピー</span><span class="btn pri grow2">保存</span></div>');
+  }
+  function snack() {
+    return screen(sb("15:20") + frmHeader("キャンセル", "11月10日（火）") + slotSeg("その他の食事") +
+      '<div class="main"><div class="inner fitbox">' + chipGroups(["sweets:チョコ"]) + "</div></div>" +
+      '<div class="bar"><span class="btn pri">保存</span></div>');
+  }
+  function editMeal() {
+    return screen(sb("21:05") + frmHeader("キャンセル", "11月9日（月）", "削除", "danger") +
+      '<div class="slot fixed">夕食<small>枠は変更できません</small></div>' +
+      '<div class="main"><div class="inner fitbox">' + chipGroups(["staple:米","protein:豚肉","vegetable:野菜","other:揚げ物"]) + "</div></div>" +
+      '<div class="bar"><span class="btn pri">保存</span></div>' +
+      '<div class="dim"></div><div class="sheet"><p>この記録を削除しますか？</p><span class="btn del">削除する</span><span class="btn plain">やめる</span></div>');
+  }
+  function stool() {
+    var shapes = SHAPES.map(function (s) {
+      var on = s[0] === "normal";
+      return '<button type="button" class="chip shape' + (on ? " on" : "") + '" aria-pressed="' + on + '"><svg class="mk" width="22" height="22" viewBox="0 0 18 18" style="color:' + (on ? "#FFFFFF" : "var(--a-mark)") + '"><use href="#st-' + s[0] + '"/></svg>' + s[1] + "</button>";
+    }).join("");
+    return screen(sb("08:10") + frmHeader("キャンセル", "11月10日（火）") +
+      '<div class="main"><div class="inner fitbox">' +
+      '<div class="fl">形状</div><div class="shapes">' + shapes + "</div>" +
+      '<div class="fl">量 <small>（任意）</small></div><div class="seg"><span>少</span><span>普通</span><span>多</span></div>' +
+      '<div class="fl">排便感 <small>（任意）</small></div><div class="seg"><span class="on">すっきり</span><span>残便感あり</span></div>' +
+      "</div></div>" + '<div class="bar"><span class="btn pri">保存</span></div>');
+  }
+  function day() {
+    var chev = '<span class="chev">›</span>';
+    function r(lb, vl, muted) { return '<div class="dr"><span class="lb">' + lb + '</span><span class="vl' + (muted ? " muted" : "") + '">' + vl + "</span>" + chev + "</div>"; }
+    var meals = r("朝食", "パン、卵、乳製品、コーヒー") + r("昼食", "米、豚肉、野菜、きのこ") + r("夕食", "米、豚肉、野菜、揚げ物") + r("その他の食事", "チョコ、アイス") +
+      '<div class="add">＋ その他の食事を追加</div>';
+    var st = '<div class="dr"><span class="tm">08:10</span><span class="stv">' + mark("normal", 18) + "普通・多・すっきり</span>" + chev + "</div>" + '<div class="add">＋ 便を追加</div>';
+    return screen(sb("12:31") + frmHeader("‹ 戻る", "11月9日（月）") +
+      '<div class="main"><div class="fitbox"><div class="sh">食事</div><div class="list">' + meals + '</div><div class="sh">便</div><div class="list">' + st + "</div></div></div>");
+  }
+  function cats() {
+    var rows = GROUPS.map(function (g) {
+      var items = g[2].map(function (it) {
+        return '<div class="cr"><span class="t ' + g[0] + '">' + it[1] + "</span><span>" + it[0] + '</span><span class="chev">›</span></div>';
+      }).join("");
+      return '<div class="sh">' + g[1] + '</div><div class="list">' + items + "</div>";
+    }).join("") + '<div class="sh">使わない</div><div class="list"><div class="cr off"><span class="t staple">そ</span><span>そば</span><span class="chev">›</span></div></div>';
+    return screen(sb("12:40") + frmHeader("‹ 戻る", "カテゴリ管理") + '<div class="main"><div class="fitbox">' + rows + "</div></div>" +
+      '<div class="bar"><span class="btn pri">カテゴリを追加</span></div>');
+  }
+  function catEdit() {
+    return screen(sb("12:41") + frmHeader("キャンセル", "カテゴリ編集") +
+      '<div class="main"><div class="inner fitbox">' +
+      '<div class="frow"><span>名称</span><span class="inp">揚げ物</span></div>' +
+      '<div class="frow"><span>略称（1文字）</span><span class="inp abbr">揚</span></div>' +
+      '<div class="frow"><span>グループ</span><span class="inp sel">その他<span>▾</span></span></div>' +
+      '<div class="frow"><span>使う</span><span class="tgl" role="img" aria-label="オン"></span></div>' +
+      '<div class="note">名称の変更は過去の記録にも反映されます</div>' +
+      "</div></div>" + '<div class="bar"><span class="btn pri">保存</span></div>');
+  }
+  function login() {
+    return screen(sb("07:58") + '<div class="login"><div class="appicon"><i></i><i></i><i></i></div><div class="appname">ひびログ</div>' +
+      '<span class="inp">メールアドレス</span><span class="inp">パスワード</span><span class="btn pri" style="flex:none;margin-top:8px">ログイン</span></div>');
+  }
+
+  function legend() {
+    var groups = GROUPS.map(function (g) {
+      return '<span class="item"><span class="lg-swatch">' + g[2].map(function (it) { return '<span class="t ' + g[0] + '">' + it[1] + "</span>"; }).join("") + "</span>" + g[1] + "</span>";
+    }).join("");
+    var marks = SHAPES.map(function (s) { return '<span class="item">' + mark(s[0], 18) + s[1] + "</span>"; }).join("");
+    return '<div class="lg"><h3>カテゴリ印（26種・5グループ）</h3><div class="lg-row">' + groups + '</div></div>' +
+      '<div class="lg"><h3>便マーク</h3><div class="lg-row">' + marks + "</div></div>";
+  }
+
+  var put = function (id, html) { document.getElementById(id).innerHTML = html; };
+  put("legend", legend());
+  put("f-week-now", week(nowWeek, "11/9〜15", true));
+  put("f-week-prev", week(prevWeek, "11/2〜8", false));
+  put("f-month", month());
+  put("f-meal", meal());
+  put("f-snack", snack());
+  put("f-stool", stool());
+  put("f-day", day());
+  put("f-edit", editMeal());
+  put("f-cats", cats());
+  put("f-catedit", catEdit());
+  put("f-login", login());
+
+  document.querySelectorAll("#f-meal .chip, #f-snack .chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var on = b.classList.toggle("on");
+      b.setAttribute("aria-pressed", String(on));
+    });
+  });
+
+  function measure() {
+    document.querySelectorAll(".fit").forEach(function (el) {
+      var host = document.getElementById(el.getAttribute("data-for"));
+      var main = host.querySelector(".main"), box = host.querySelector(".fitbox");
+      if (!main || !box) { el.textContent = "縦の収まり：収まる"; el.className = "fit ok"; return; }
+      var diff = Math.round(main.clientHeight - box.offsetHeight);
+      if (diff >= 0) { el.textContent = "縦の収まり：収まる（余白 " + diff + "px）"; el.className = "fit ok"; }
+      else { el.textContent = "縦の収まり：" + (-diff) + "px はみ出し（スクロール）"; el.className = "fit over"; }
+    });
+  }
+  measure();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+})();
+</script>
