@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ログインした本人の領域（users/{uid}/...）だけを読み書きできる。
+    // 新規登録はアプリに設けず、Authentication の「ユーザー作成」も無効にして
+    // 利用者を本人1名に限定する（docs/06-tech.md 5章）。
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isDateKey(v) {
+      return v is string && v.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    match /users/{uid}/categories/{id} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 10
+        && request.resource.data.abbr is string
+        && request.resource.data.abbr.size() >= 1
+        && request.resource.data.group in ['staple', 'protein', 'vegetable', 'other', 'sweets']
+        && request.resource.data.active is bool
+        && request.resource.data.order is number;
+      // 削除はせず「使わない」にする（Scope Q7）
+      allow delete: if false;
+    }
+
+    match /users/{uid}/meals/{id} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && isDateKey(request.resource.data.date)
+        && request.resource.data.slot in ['breakfast', 'lunch', 'dinner', 'other']
+        && request.resource.data.categoryIds is list
+        && request.resource.data.categoryIds.size() >= 1;
+      allow delete: if isOwner(uid);
+    }
+
+    match /users/{uid}/stools/{id} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && isDateKey(request.resource.data.date)
+        && request.resource.data.occurredAt is timestamp
+        && request.resource.data.shape in ['hard', 'normal', 'soft', 'diarrhea']
+        && (!('amount' in request.resource.data) || request.resource.data.amount in ['small', 'normal', 'large'])
+        && (!('feeling' in request.resource.data) || request.resource.data.feeling in ['clear', 'residual']);
+      allow delete: if isOwner(uid);
+    }
+  }
+}
