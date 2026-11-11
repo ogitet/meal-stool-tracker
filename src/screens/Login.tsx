@@ -24,7 +24,7 @@ export function Login() {
   return (
     <div className="screen">
       <form className="login" onSubmit={onSubmit}>
-        <div className="logo" aria-hidden="true"><i /><i /><i /></div>
+        <img className="logo" src="/icons/icon-192.png" alt="" width={72} height={72} />
         <h1 className="appname">ひびログ</h1>
         <p className="tagline">日々を、押していく。</p>
         <label htmlFor="email" className="sr">メールアドレス</label>
