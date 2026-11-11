@@ -1,11 +1,11 @@
 import { SHAPE_LABEL } from "../lib/constants";
 import type { Shape } from "../lib/types";
 
-/** 便マーク4種（Surface 3章）。単色で、輪郭の形で区別する。 */
+/** 便マーク4種（Surface 3章）。輪郭の形に加え、茶色の濃淡（硬い=濃→下痢=黄土）でも区別する。 */
 export function StoolMark({ shape, size = 18, color }: { shape: Shape; size?: number; color?: string }) {
   return (
     <svg
-      className="mk"
+      className={`mk mk-${shape}`}
       width={size}
       height={size}
       viewBox="0 0 18 18"
