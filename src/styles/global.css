@@ -26,6 +26,7 @@
   --font-num: "Bodoni Moda", "Bodoni 72", Didot, "Zen Kaku Gothic Antique", "Hiragino Sans", serif;
   --ease: cubic-bezier(.2, .8, .2, 1);
   --gutter: 12px;
+  --top-gap: 17px;
   --focus: var(--accent-deep);
   color-scheme: light;
 }
@@ -55,10 +56,13 @@ h1, h2, p { margin: 0; }
 
 /* ---- 骨格：コバルトの地 ＋ 紙のシート ---- */
 .screen {
-  height: 100%;
+  /* iOS のホーム画面アプリでは height: 100% が画面より短くなり、下に地が覗くことがある。表示領域の四辺に固定する */
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  padding-top: env(safe-area-inset-top, 0px);
+  /* iOS 26.1 以降、ステータスバーの下に端末側のぼかしがかかる。無地の余白だけがぼけるよう、上端を空ける */
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--top-gap));
   background: var(--ground);
 }
 .paper {

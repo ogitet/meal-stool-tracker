@@ -34,7 +34,7 @@ const arc = (cx, cy, R, a0, a1, w) => (px, py) => {
 };
 
 // 日めくり1枚（-6 度に傾ける）
-const SLIP = { cx: 50, cy: 54, hw: 29, hh: 31, deg: -6 };
+const SLIP = { cx: 47.9, cy: 49.6, hw: 29, hh: 31, deg: -6 };
 const inSlip = (u, v) => {
   const a = rad(SLIP.deg), c = Math.cos(a), s = Math.sin(a);
   return [SLIP.cx + u * c - v * s, SLIP.cy + u * s + v * c];
