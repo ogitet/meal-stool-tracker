@@ -16,6 +16,11 @@
   --veil: rgba(255, 255, 255, .55);
   --shade: rgba(60, 80, 140, .35);
 
+  --s-hard: #7a4a1e;
+  --s-normal: #a0692f;
+  --s-soft: #c48a3f;
+  --s-diarrhea: #d9a441;
+
   --g-staple-bg: #f2c14e; --g-staple-fg: #3a2a00;
   --g-protein-bg: #c4472f; --g-protein-fg: #ffffff;
   --g-vegetable-bg: #2d7f63; --g-vegetable-fg: #ffffff;
@@ -250,6 +255,10 @@ h1, h2, p { margin: 0; }
 .g-other { background: var(--g-other-bg); color: var(--g-other-fg); }
 .g-sweets { background: var(--g-sweets-bg); color: var(--g-sweets-fg); }
 .mk { color: var(--ink); flex: none; display: block; }
+.mk-hard { color: var(--s-hard); }
+.mk-normal { color: var(--s-normal); }
+.mk-soft { color: var(--s-soft); }
+.mk-diarrhea { color: var(--s-diarrhea); }
 
 /* ---- カレンダー ---- */
 .cal-hd { display: flex; gap: 2px; min-height: 52px; padding: 0 8px 0 10px; }
