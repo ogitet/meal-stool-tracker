@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Segment } from "../components/Segment";
 import { ErrorRetry } from "../components/Status";
 import { StoolMark } from "../components/StoolMark";
@@ -7,6 +7,7 @@ import { TileRow } from "../components/Tile";
 import { useMealsInRange } from "../data/meals";
 import { useStoolsInRange } from "../data/stools";
 import { useUserData } from "../data/UserDataContext";
+import { useNav } from "../hooks/useNav";
 import { dayTiles } from "../lib/categories";
 import {
   formatMonthJa,
@@ -30,10 +31,15 @@ import type { Category, DateKey, Meal, Stool } from "../lib/types";
 
 type View = "week" | "month";
 
+const WEEK_MONTH = [
+  { value: "week" as const, label: "週" },
+  { value: "month" as const, label: "月" },
+];
+
 /** S-02 カレンダー。表示（週／月）と基準日は URL に持ち、戻ったときに同じ期間を示す。 */
 export function Calendar() {
   const [params, setParams] = useSearchParams();
-  const navigate = useNavigate();
+  const nav = useNav();
   const view: View = params.get("view") === "month" ? "month" : "week";
   const anchorKey = isDateKey(params.get("d") ?? undefined) ? (params.get("d") as DateKey) : todayKey();
   const anchor = useMemo(() => fromKey(anchorKey), [anchorKey]);
@@ -47,24 +53,23 @@ export function Calendar() {
   }
 
   const today = todayKey();
-  const WEEK_MONTH = [
-    { value: "week" as const, label: "週" },
-    { value: "month" as const, label: "月" },
-  ];
+  const shift = (n: number) => toKey(view === "week" ? shiftWeek(anchor, n) : shiftMonth(anchor, n));
 
   return (
     <div className="screen">
       <header className="hd cal-hd">
         <Segment options={WEEK_MONTH} value={view} onChange={(v) => v && update({ view: v })} className="sm" label="表示の切替" />
         <div className="nav">
-          <button type="button" className="arw" aria-label={view === "week" ? "前の週" : "前の月"}
-            onClick={() => update({ d: toKey(view === "week" ? shiftWeek(anchor, -1) : shiftMonth(anchor, -1)) })}>‹</button>
-          <h1 className="rng num" style={{ margin: 0 }}>{view === "week" ? formatWeekRange(anchor) : formatMonthJa(anchor)}</h1>
-          <button type="button" className="arw" aria-label={view === "week" ? "次の週" : "次の月"}
-            onClick={() => update({ d: toKey(view === "week" ? shiftWeek(anchor, 1) : shiftMonth(anchor, 1)) })}>›</button>
+          <button type="button" className="arw" aria-label={view === "week" ? "前の週" : "前の月"} onClick={() => update({ d: shift(-1) })}>‹</button>
+          <h1 className="rng" aria-label={view === "week" ? formatWeekRange(anchor) : formatMonthJa(anchor)}>
+            {view === "week"
+              ? formatWeekRange(anchor).replace("〜", "–")
+              : <>{anchor.getFullYear()}<span className="u">年</span>{anchor.getMonth() + 1}<span className="u">月</span></>}
+          </h1>
+          <button type="button" className="arw" aria-label={view === "week" ? "次の週" : "次の月"} onClick={() => update({ d: shift(1) })}>›</button>
         </div>
-        <button type="button" className="lnk" style={{ fontSize: 14 }} onClick={() => update({ d: today })}>今日</button>
-        <button type="button" className="ico" aria-label="カテゴリ管理" onClick={() => navigate("/categories")}>
+        <button type="button" className="pill" onClick={() => update({ d: today })}>今日</button>
+        <button type="button" className="ico" aria-label="カテゴリ管理" onClick={() => nav.go("/categories", "push")}>
           <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
             <circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -73,17 +78,17 @@ export function Calendar() {
         </button>
       </header>
 
-      <div className="main">
+      <div className="main cal">
         {view === "week" ? (
-          <WeekView key={`w${retry}`} anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
+          <WeekView key={`w${anchorKey}${retry}`} anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
         ) : (
           <MonthView key={`m${retry}`} anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
         )}
       </div>
 
-      <nav className="bar" aria-label="記録">
-        <button type="button" className="btn pri" onClick={() => navigate(`/meal/${today}/${inferSlot()}`)}>食事</button>
-        <button type="button" className="btn pri" onClick={() => navigate(`/stool/new?date=${today}`)}>便</button>
+      <nav className="bar cal" aria-label="記録">
+        <button type="button" className="btn rec" onClick={() => nav.go(`/meal/${today}/${inferSlot()}`, "open")}>食事</button>
+        <button type="button" className="btn rec" onClick={() => nav.go(`/stool/new?date=${today}`, "open")}>便</button>
       </nav>
     </div>
   );
@@ -101,7 +106,7 @@ function groupByDate<T extends { date: DateKey }>(items: T[]): Map<DateKey, T[]>
 
 function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; onRetry: () => void }) {
   const { uid, categories } = useUserData();
-  const navigate = useNavigate();
+  const nav = useNav();
   const { start, end } = weekRange(anchor);
   const meals = useMealsInRange(uid, start, end);
   const stools = useStoolsInRange(uid, start, end);
@@ -127,12 +132,13 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
             key={key}
             type="button"
             role="listitem"
-            className={`row${isToday ? " today" : ""}${future ? " future" : ""}`}
+            className={`slip${isToday ? " today" : ""}${future ? " future" : ""}`}
             disabled={future}
-            aria-label={`${d.getMonth() + 1}月${d.getDate()}日 ${weekdayJa(d)}曜日`}
-            onClick={() => navigate(`/day/${key}`)}
+            aria-current={isToday ? "date" : undefined}
+            aria-label={`${d.getMonth() + 1}月${d.getDate()}日 ${weekdayJa(d)}曜日${isToday ? " 今日" : ""}`}
+            onClick={() => nav.go(`/day/${key}`, "push")}
           >
-            <span className="dt"><span className="wd">{weekdayJa(d)}</span><span className="dn num">{d.getDate()}</span></span>
+            <span className="dt"><span className="dn">{d.getDate()}</span><span className="wd">{weekdayJa(d)}</span></span>
             <span className="stl">{dayStools.map((s) => <StoolMark key={s.id} shape={s.shape} size={18} />)}</span>
             <span className="fd">
               {tiles.length > 0 ? <TileRow categories={tiles} /> : empty && !future ? <span className="none">未記録</span> : null}
@@ -146,7 +152,7 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
 
 function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; onRetry: () => void }) {
   const { uid } = useUserData();
-  const navigate = useNavigate();
+  const nav = useNav();
   const { start, end } = monthRange(anchor);
   const stools = useStoolsInRange(uid, start, end);
   const stoolsBy = useMemo(() => groupByDate(stools.items), [stools.items]);
@@ -172,10 +178,11 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
               role="listitem"
               className={cls}
               disabled={future}
+              aria-current={key === today ? "date" : undefined}
               aria-label={`${d.getMonth() + 1}月${d.getDate()}日${marks.length ? ` 便${marks.length}回` : ""}`}
-              onClick={() => navigate(`/day/${key}`)}
+              onClick={() => nav.go(`/day/${key}`, "push")}
             >
-              <span className="md num">{d.getDate()}</span>
+              <span className="md">{d.getDate()}</span>
               <span className="mm">
                 {shown.map((s) => <StoolMark key={s.id} shape={s.shape} size={14} />)}
                 {marks.length > 6 && <span className="more">+{marks.length - 6}</span>}

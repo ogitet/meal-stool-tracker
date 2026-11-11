@@ -24,9 +24,10 @@ export function Login() {
   return (
     <div className="screen">
       <form className="login" onSubmit={onSubmit}>
-        <div className="appicon" aria-hidden="true"><i /><i /><i /></div>
-        <h1 className="appname" style={{ margin: "0 0 20px" }}>ひびログ</h1>
-        <label htmlFor="email" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>メールアドレス</label>
+        <div className="logo" aria-hidden="true"><i /><i /><i /></div>
+        <h1 className="appname">ひびログ</h1>
+        <p className="tagline">日々を、押していく。</p>
+        <label htmlFor="email" className="sr">メールアドレス</label>
         <input
           id="email"
           className="inp"
@@ -38,7 +39,7 @@ export function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <label htmlFor="password" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>パスワード</label>
+        <label htmlFor="password" className="sr">パスワード</label>
         <input
           id="password"
           className="inp"
@@ -49,10 +50,10 @@ export function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="btn pri" style={{ flex: "none", marginTop: 8 }} disabled={busy}>
+        <button type="submit" className="btn inv" disabled={busy}>
           {busy ? "ログインしています…" : "ログイン"}
         </button>
-        {error && <div className="msg center" role="alert" style={{ padding: 0 }}>{error}</div>}
+        {error && <div className="msg" role="alert">{error}</div>}
       </form>
     </div>
   );

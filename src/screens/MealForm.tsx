@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import { ConfirmSheet } from "../components/ConfirmSheet";
+import { DateTitle } from "../components/DateTitle";
 import { Header } from "../components/Header";
 import { Segment } from "../components/Segment";
 import { Loading } from "../components/Status";
@@ -8,9 +9,9 @@ import { useToast } from "../components/Toast";
 import { createMeal, deleteMeal, findPreviousMeal, fixedMealId, getMeal, updateMealCategories } from "../data/meals";
 import { useUserData } from "../data/UserDataContext";
 import { writeErrorMessage } from "../data/write";
-import { useBack } from "../hooks/useBack";
+import { useNav } from "../hooks/useNav";
 import { GROUPS, SLOT_LABEL, SLOTS } from "../lib/constants";
-import { formatDayJa, isDateKey, isFuture } from "../lib/date";
+import { isDateKey, isFuture } from "../lib/date";
 import type { Category, Meal, Slot } from "../lib/types";
 
 interface CarriedState {
@@ -37,10 +38,10 @@ export function MealForm() {
 
 function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; otherId?: string }) {
   const { uid, categories } = useUserData();
-  const navigate = useNavigate();
+  const nav = useNav();
   const location = useLocation();
   const toast = useToast();
-  const back = useBack(`/day/${date}`);
+  const back = () => nav.back(`/day/${date}`);
 
   const [existing, setExisting] = useState<Meal | null | undefined>(undefined); // undefined = 読み込み中
   const [selected, setSelected] = useState<string[]>(() => (location.state as CarriedState | null)?.selected ?? []);
@@ -93,7 +94,7 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
 
   function switchSlot(next: Slot) {
     if (next === slot) return;
-    navigate(`/meal/${date}/${next}`, { replace: true, state: { selected } satisfies CarriedState });
+    nav.go(`/meal/${date}/${next}`, "none", { replace: true, state: { selected } satisfies CarriedState });
   }
 
   function copyPrevious() {
@@ -123,7 +124,7 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
     try {
       await deleteMeal(uid, existing.id);
       toast("削除しました");
-      navigate(`/day/${date}`, { replace: true });
+      back();
     } catch (e) {
       setConfirm(false);
       setError(writeErrorMessage(e));
@@ -137,64 +138,66 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
     <div className="screen">
       <Header
         left={<button type="button" className="lnk" onClick={back}>キャンセル</button>}
-        title={formatDayJa(date)}
-        right={isEdit ? <button type="button" className="lnk danger" onClick={() => setConfirm(true)}>削除</button> : null}
+        title={<DateTitle date={date} />}
+        right={isEdit ? <button type="button" className="lnk" onClick={() => setConfirm(true)}>削除</button> : null}
       />
 
-      {existing === undefined ? (
-        <div className="slot" style={{ minHeight: 48 }} />
-      ) : isEdit ? (
-        <div className="slot fixed">{SLOT_LABEL[slot]}<small>枠は変更できません</small></div>
-      ) : (
-        <div className="slot">
-          <Segment options={slotOptions} value={slot} onChange={(v) => v && switchSlot(v)} className="slot" label="食事枠" />
-        </div>
-      )}
-
-      <div className="main pad">
-        {existing === undefined || categories.loading ? (
-          <Loading />
+      <div className="paper">
+        {existing === undefined ? (
+          <div className="slot" style={{ minHeight: 54 }} />
+        ) : isEdit ? (
+          <div className="slot fixed">{SLOT_LABEL[slot]}<small>枠は変更できません</small></div>
         ) : (
-          GROUPS.map((g) => {
-            const items = visible.filter((c) => c.group === g.id);
-            if (items.length === 0) return null;
-            return (
-              <section key={g.id} aria-labelledby={`g-${g.id}`}>
-                <h2 id={`g-${g.id}`} className="gh" style={{ margin: 0 }}>
-                  <i className={`sw g-${g.id}`} aria-hidden="true" />{g.label}
-                </h2>
-                <div className="chips">
-                  {items.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      className={`chip${Array.from(c.name).length > 5 ? " long" : ""}`}
-                      aria-pressed={selected.includes(c.id)}
-                      onClick={() => toggle(c)}
-                    >
-                      {c.name}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            );
-          })
+          <div className="slot">
+            <Segment options={slotOptions} value={slot} onChange={(v) => v && switchSlot(v)} className="slot" label="食事枠" />
+          </div>
         )}
-        {error && <div className="msg" role="alert" style={{ padding: "8px 0 0" }}>{error}</div>}
-      </div>
 
-      <div className="bar">
-        {isNewFixed && previous && (
-          <button type="button" className="btn out" onClick={copyPrevious}>前回をコピー</button>
-        )}
-        <button
-          type="button"
-          className={`btn pri${isNewFixed && previous ? " grow2" : ""}`}
-          disabled={busy || selected.length === 0 || existing === undefined}
-          onClick={save}
-        >
-          {busy ? "保存しています…" : "保存"}
-        </button>
+        <div className="main pad">
+          {existing === undefined || categories.loading ? (
+            <Loading />
+          ) : (
+            GROUPS.map((g) => {
+              const items = visible.filter((c) => c.group === g.id);
+              if (items.length === 0) return null;
+              return (
+                <section key={g.id} aria-labelledby={`g-${g.id}`}>
+                  <h2 id={`g-${g.id}`} className="gh">
+                    <i className={`sw g-${g.id}`} aria-hidden="true" />{g.label}
+                  </h2>
+                  <div className="chips">
+                    {items.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className={`chip c-${c.group}${Array.from(c.name).length > 5 ? " long" : ""}`}
+                        aria-pressed={selected.includes(c.id)}
+                        onClick={() => toggle(c)}
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              );
+            })
+          )}
+          {error && <div className="msg" role="alert">{error}</div>}
+        </div>
+
+        <div className="bar">
+          {isNewFixed && previous && (
+            <button type="button" className="btn out" onClick={copyPrevious}>前回をコピー</button>
+          )}
+          <button
+            type="button"
+            className={`btn pri${isNewFixed && previous ? " grow2" : ""}`}
+            disabled={busy || selected.length === 0 || existing === undefined}
+            onClick={save}
+          >
+            {busy ? "保存しています…" : "保存"}
+          </button>
+        </div>
       </div>
 
       {confirm && (

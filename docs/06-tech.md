@@ -65,7 +65,9 @@ flowchart LR
 | 言語 | TypeScript | データの形の誤りを書く段階で防げる |
 | ビルド | Vite | 設定が少なく、開発時の反映が速い |
 | UI | React →Q35 | 情報と事例が多く、8画面規模の状態管理を素直に書ける |
-| 画面遷移 | React Router | URL と画面を対応させ、ブラウザの戻る操作に対応する |
+| 画面遷移 | React Router（データルーター） | URL と画面を対応させ、ブラウザの戻る操作に対応する。遷移の動きは View Transitions API で付ける（[src/hooks/useNav.ts](../src/hooks/useNav.ts)） |
+| 書体 | Google Fonts（Bodoni Moda、Zen Kaku Gothic Antique） | Surface 第2版の数字と印に使う。Service Worker で端末に保持する |
+| デザイン確認 | デモモード（`npm run demo`） | `src/data/*` を `src/demo/*` のメモリ内実装に差し替え、Firebase なしで全画面を例データで表示する。本番ビルドには含まれない |
 | スタイル | 素の CSS（CSS変数、1ファイルの `global.css`） | Surface の配色と寸法をそのまま変数にできる。UIライブラリは使わない。実装時に CSS Modules は使わず、クラス名の接頭辞で画面ごとに分けた（規模が小さく、1ファイルのほうが見通しがよい） |
 | PWA | vite-plugin-pwa | マニフェストと、画面のファイルをキャッシュする Service Worker を生成する |
 | 日付処理 | date-fns | 週の開始（月曜）、月の範囲などの計算を確実にする |

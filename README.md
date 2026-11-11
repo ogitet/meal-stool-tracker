@@ -15,6 +15,7 @@
 cp .env.example .env.local   # Firebase の設定値を記入
 npm install
 npm run dev                  # http://localhost:5173
+npm run demo                 # http://localhost:5199 例データで全画面を表示（Firebase 不要、デザイン確認用）
 npm test                     # 日付・カテゴリの純粋関数のテスト
 npm run build                # dist/ に出力
 ```

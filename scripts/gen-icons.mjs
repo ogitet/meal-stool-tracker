@@ -3,7 +3,7 @@
 import { deflateSync } from "node:zlib";
 import { mkdirSync, writeFileSync } from "node:fs";
 
-const BG = [0x1f, 0x6f, 0x6b];
+const BG = [0x2a, 0x3f, 0xd4];
 const FG = [0xff, 0xff, 0xff];
 
 function crc32(buf) {
