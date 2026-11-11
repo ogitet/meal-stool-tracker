@@ -276,6 +276,14 @@ h1, h2, p { margin: 0; }
 .pill:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .main.cal { padding: 0 8px 4px; color: var(--on-ground); }
+/* 左右スワイプで期間を送る。縦のスクロールはブラウザに任せる */
+.main.swipe { touch-action: pan-y; overflow-x: hidden; }
+.track { transition: transform .25s var(--ease); }
+.track.dragging { transition: none; }
+.pager.from-r { animation: page-r .32s var(--ease); }
+.pager.from-l { animation: page-l .32s var(--ease); }
+@keyframes page-r { from { transform: translateX(36px); opacity: 0; } }
+@keyframes page-l { from { transform: translateX(-36px); opacity: 0; } }
 
 /* 週：1日＝1枚の紙片 */
 .slip {

@@ -8,6 +8,7 @@ import { useMealsInRange } from "../data/meals";
 import { useStoolsInRange } from "../data/stools";
 import { useUserData } from "../data/UserDataContext";
 import { useNav } from "../hooks/useNav";
+import { useSwipe, type SwipeDir } from "../hooks/useSwipe";
 import { dayTiles } from "../lib/categories";
 import {
   formatMonthJa,
@@ -44,6 +45,8 @@ export function Calendar() {
   const anchorKey = isDateKey(params.get("d") ?? undefined) ? (params.get("d") as DateKey) : todayKey();
   const anchor = useMemo(() => fromKey(anchorKey), [anchorKey]);
   const [retry, setRetry] = useState(0);
+  // 期間を送った向き。新しい期間をその向きから入れる（0 は動きなし）
+  const [dir, setDir] = useState<SwipeDir | 0>(0);
 
   function update(next: { view?: View; d?: DateKey }) {
     const p = new URLSearchParams(params);
@@ -54,21 +57,30 @@ export function Calendar() {
 
   const today = todayKey();
   const shift = (n: number) => toKey(view === "week" ? shiftWeek(anchor, n) : shiftMonth(anchor, n));
+  function go(n: SwipeDir) {
+    setDir(n);
+    update({ d: shift(n) });
+  }
+  function goToday() {
+    setDir(today === anchorKey ? 0 : today > anchorKey ? 1 : -1);
+    update({ d: today });
+  }
+  const swipe = useSwipe(go);
 
   return (
     <div className="screen">
       <header className="hd cal-hd">
-        <Segment options={WEEK_MONTH} value={view} onChange={(v) => v && update({ view: v })} className="sm" label="表示の切替" />
+        <Segment options={WEEK_MONTH} value={view} onChange={(v) => { if (v) { setDir(0); update({ view: v }); } }} className="sm" label="表示の切替" />
         <div className="nav">
-          <button type="button" className="arw" aria-label={view === "week" ? "前の週" : "前の月"} onClick={() => update({ d: shift(-1) })}>‹</button>
+          <button type="button" className="arw" aria-label={view === "week" ? "前の週" : "前の月"} onClick={() => go(-1)}>‹</button>
           <h1 className="rng" aria-label={view === "week" ? formatWeekRange(anchor) : formatMonthJa(anchor)}>
             {view === "week"
               ? formatWeekRange(anchor).replace("〜", "–")
               : <>{anchor.getFullYear()}<span className="u">年</span>{anchor.getMonth() + 1}<span className="u">月</span></>}
           </h1>
-          <button type="button" className="arw" aria-label={view === "week" ? "次の週" : "次の月"} onClick={() => update({ d: shift(1) })}>›</button>
+          <button type="button" className="arw" aria-label={view === "week" ? "次の週" : "次の月"} onClick={() => go(1)}>›</button>
         </div>
-        <button type="button" className="pill" onClick={() => update({ d: today })}>今日</button>
+        <button type="button" className="pill" onClick={goToday}>今日</button>
         <button type="button" className="ico" aria-label="カテゴリ管理" onClick={() => nav.go("/categories", "push")}>
           <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
@@ -78,12 +90,19 @@ export function Calendar() {
         </button>
       </header>
 
-      <div className="main cal">
-        {view === "week" ? (
-          <WeekView key={`w${anchorKey}${retry}`} anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
-        ) : (
-          <MonthView key={`m${retry}`} anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
-        )}
+      <div className="main cal swipe" {...swipe.handlers}>
+        <div
+          className={`track${swipe.dx ? " dragging" : ""}`}
+          style={swipe.dx ? { transform: `translateX(${swipe.dx * 0.35}px)` } : undefined}
+        >
+          <div key={`${view}${anchorKey}${retry}`} className={`pager${dir === 1 ? " from-r" : dir === -1 ? " from-l" : ""}`}>
+            {view === "week" ? (
+              <WeekView anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
+            ) : (
+              <MonthView anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
+            )}
+          </div>
+        </div>
       </div>
 
       <nav className="bar cal" aria-label="記録">
