@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import type { User } from "firebase/auth";
 
 export interface AuthState {
@@ -5,17 +6,24 @@ export interface AuthState {
   loading: boolean;
 }
 
-/** `?login` を付けるとログイン画面を表示する。 */
+/** `?login` を付けて開くと、ログアウトした状態から始まる。 */
+let user: User | null = new URLSearchParams(window.location.search).has("login") ? null : ({ uid: "demo" } as User);
+const listeners = new Set<() => void>();
+const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l); }; };
+
 export function useAuth(): AuthState {
-  const loggedOut = new URLSearchParams(window.location.search).has("login");
-  return { user: loggedOut ? null : ({ uid: "demo" } as User), loading: false };
+  return { user: useSyncExternalStore(subscribe, () => user), loading: false };
 }
 
 export async function login(): Promise<void> {
-  window.location.assign("/");
+  user = { uid: "demo" } as User;
+  listeners.forEach((l) => l());
 }
 
-export async function logout(): Promise<void> {}
+export async function logout(): Promise<void> {
+  user = null;
+  listeners.forEach((l) => l());
+}
 
 export function loginErrorMessage(): string {
   return "ログインできませんでした";

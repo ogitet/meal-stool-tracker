@@ -88,7 +88,11 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
     return categories.all.filter((c) => c.active || initial.has(c.id));
   }, [categories.all, existing]);
 
+  // 「使わない」カテゴリは外せるが、一度外すと選び直せない（Structure 7章）
+  const canSelect = (c: Category) => c.active || selected.includes(c.id);
+
   function toggle(c: Category) {
+    if (!canSelect(c)) return;
     setSelected((s) => (s.includes(c.id) ? s.filter((x) => x !== c.id) : [...s, c.id]));
   }
 
@@ -172,6 +176,8 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
                         type="button"
                         className={`chip c-${c.group}${Array.from(c.name).length > 5 ? " long" : ""}`}
                         aria-pressed={selected.includes(c.id)}
+                        disabled={!canSelect(c)}
+                        title={c.active ? undefined : "使わないカテゴリ"}
                         onClick={() => toggle(c)}
                       >
                         {c.name}

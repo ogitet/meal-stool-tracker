@@ -53,7 +53,7 @@ const DAYS: { b?: string[]; l?: string[]; d?: string[]; o?: string[][]; s?: Shap
   { l: ["staple_noodle", "protein_egg"], s: ["normal", "soft"] },
   { b: ["staple_rice", "protein_fish"], d: ["staple_rice", "protein_beef", "vegetable_veg"], s: ["normal"] },
   { b: ["staple_bread", "other_coffee"], s: ["soft"] },
-  { l: ["staple_rice", "protein_chicken", "other_fried"], s: ["normal"] },
+  { l: ["staple_rice", "protein_chicken", "other_fried", "demo_soba"], s: ["normal"] },
   { b: ["staple_bread", "protein_egg"], s: ["hard"] },
 ];
 
