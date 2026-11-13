@@ -11,15 +11,20 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      VP_GIT_HOOKS: "0" # CI では git フックを入れない
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Vite+ と Node（.node-version）を用意し、lockfile どおりに依存を入れる。
+      # 版は固定する（v1 タグは v1.15.0 で更新が止まっているため使わない）
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version-file: package.json # volta.node（Volta の固定）を読む
-          cache: npm
-      - run: npm ci
+          node-version-file: .node-version
+          cache: true
+          run-install: |
+            - args: ['--frozen-lockfile']
       # E2E テストは PR を出す前に手元で実行する。ここでは短い単体テストだけを最後の確認として残す
-      - run: npm test
+      - run: vp test run
       - name: Write service account key
         run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
       - name: Build & deploy
