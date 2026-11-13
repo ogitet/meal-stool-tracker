@@ -1,7 +1,7 @@
 name: CI
 
-# main への PR で、整形・lint・型（vp check）、単体テスト、ビルドを走らせる。マージの前に、ここが通っていることを確かめる。
-# E2E テストは時間がかかるため CI では実行せず、PR を出す前に手元で実行する（npm run test:e2e）。
+# main への PR で、整形・lint・型（vp check）、単体テスト、ビルド、E2E、Firestore ルールのテストを走らせる。
+# マージの前に、ここが通っていることを確かめる。
 on:
   pull_request:
     branches: [main]
@@ -10,17 +10,22 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# GITHUB_TOKEN の権限は、コードの読み取りだけにする
+permissions:
+  contents: read
+
+env:
+  VP_GIT_HOOKS: "0" # CI では git フックを入れない（prepare の vp config を無効にする）
+
+# Actions はタグではなくコミットの SHA で固定する（タグは後から付け替えられるため）。更新は Dependabot が PR を出す。
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      VP_GIT_HOOKS: "0" # CI では git フックを入れない（prepare の vp config を無効にする）
     steps:
-      - uses: actions/checkout@v4
-      # Vite+ と Node（.node-version）を用意し、lockfile どおりに依存を入れる。
-      # 版は固定する（v1 タグは v1.15.0 で更新が止まっているため使わない）
-      - uses: voidzero-dev/setup-vp@v1.22.0
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      # Vite+ と Node（.node-version）を用意し、lockfile どおりに依存を入れる
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           node-version-file: .node-version
           cache: true
@@ -32,3 +37,47 @@ jobs:
         run: vp test run
       - name: Type check & build
         run: npm run build
+
+  # 画面の E2E（デモモードの画面を Chromium と WebKit で操作する。Firebase には接続しない）
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          cache: true
+          run-install: |
+            - args: ['--frozen-lockfile']
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: E2E tests
+        run: npm run test:e2e
+      # 失敗したときの操作の記録（trace）を残す
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 7
+
+  # firestore.rules のテスト（Firestore エミュレーターで実行する。本番には接続しない）
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          node-version-file: .node-version
+          cache: true
+          run-install: |
+            - args: ['--frozen-lockfile']
+      # エミュレーターは Java で動く
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Firestore rules tests
+        run: npm run test:rules
