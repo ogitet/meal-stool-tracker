@@ -18,7 +18,7 @@ npm run dev                  # http://localhost:5173
 npm run demo                 # http://localhost:5199 例データで全画面を表示（Firebase 不要、デザイン確認用）
 npm run check                # 整形・lint・型チェック（vp check。--fix で自動修正）
 npm run fmt                  # 整形（oxfmt）
-npm test                     # 日付・カテゴリの純粋関数のテスト
+npm test                     # 単体テスト（日付・カテゴリの関数、Node の版の一致）
 npm run test:e2e             # 画面の E2E テスト（Playwright。例データの画面を Chromium と WebKit で操作）
 npm run test:e2e:ui          # 同上を、操作の様子を見ながら実行
 npm run build                # dist/ に出力
@@ -58,3 +58,10 @@ npm run deploy
 ```
 
 初回ログイン時にカテゴリが空なら、初期の26種が自動で作成される。
+
+## Node のバージョン
+
+26.13.1 に固定している。次の2か所に同じ版を書く。**Node を上げるときは、両方を変える**（ずれると `npm test` が失敗する）。
+
+- `.node-version`：CI（`setup-vp`）が読む
+- `package.json` の `volta.node`：手元の Volta が読む（`volta install node@<版>` も実行する）
