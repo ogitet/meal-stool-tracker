@@ -1,0 +1,31 @@
+# 依存と GitHub Actions の更新を、週に1回 PR で受け取る。
+# PR では CI（check・単体テスト・build・E2E・ルールのテスト）が走る。マージすると本番にデプロイされる点は通常の PR と同じ。
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 5
+    ignore:
+      # Vite+ は vite の別名・overrides・CI の setup-vp と版をそろえる必要があるため、手で上げる
+      - dependency-name: vite
+      - dependency-name: vite-plus
+    groups:
+      # firebase と @firebase/rules-unit-testing は peer の関係にあるため、一緒に上げる
+      firebase:
+        patterns: ["firebase", "@firebase/*"]
+      # 上記以外の minor・patch は1つの PR にまとめる。major は1件ずつ
+      minor-and-patch:
+        update-types: [minor, patch]
+  # SHA で固定した Actions の更新（ハッシュと、横に書いた版のコメントを書き換える）
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo

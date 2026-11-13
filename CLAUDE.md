@@ -15,16 +15,18 @@ npm run storybook      # :6006
 npm run check          # 整形・lint・型チェック（--fix で自動修正）。CI と同じ
 npm test               # 単体テスト（src/**/*.test.ts, scripts/**/*.test.ts）
 npx vp test run src/lib/date.test.ts   # 単一ファイル
+npm run test:rules     # firestore.rules のテスト（firestore-tests/。Firestore エミュレーターで実行、Java 21 以上が必要）
 npm run test:e2e       # Playwright（demo サーバーを自動起動、Chromium と WebKit、375x667）
 npx playwright test e2e/record.spec.ts --project=chromium -g "テスト名"   # 単一の E2E
 npm run build          # dist/
 ```
 
-E2E は初回のみ `npx playwright install chromium webkit`。E2E は CI で走らせないので、PR 前に手元で実行する。
+E2E は初回のみ `npx playwright install chromium webkit`。E2E とルールのテストは PR の CI でも走る。`firestore.rules` を変えたら `firestore-tests/rules.test.ts` も直す。
 
 ## 運用
 
-- `main` に直接コミット・プッシュしない。作業ブランチ → PR → CI（check・単体テスト・build）が通ったらユーザーがマージ。**マージで本番にデプロイされる**（`.github/workflows/deploy.yml`）。
+- `main` に直接コミット・プッシュしない。作業ブランチ → PR → CI（check・単体テスト・build・E2E・ルールのテスト）が通ったらユーザーがマージ。**マージで本番にデプロイされる**（`.github/workflows/deploy.yml`）。
+- ワークフローの Actions はコミットの SHA で固定し、`GITHUB_TOKEN` は `contents: read` に絞っている。Actions と npm の更新は Dependabot（`.github/dependabot.yml`）が週次で PR を出す。Vite+（`vite`・`vite-plus`・`setup-vp`）は対象外で、手で版をそろえて上げる。
 - コミット時に `.vite-hooks/pre-commit`（`vp staged` → `vp check --fix`）が走り、lint・型エラーがあるとコミットできない。
 
 ## アーキテクチャ
