@@ -40,7 +40,8 @@ export function useSwipe(onSwipe: (dir: SwipeDir) => void) {
         if (Math.abs(mx) < LOCK && Math.abs(my) < LOCK) return;
         s.axis = Math.abs(mx) > Math.abs(my) ? "x" : "y";
         if (s.axis === "y") return;
-        e.currentTarget.setPointerCapture(e.pointerId);
+        // 指が要素の外へ出ても追えるようにする。捕捉できない環境でも払う操作は続ける
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* 捕捉なしで続行 */ }
       }
       setDx(mx);
     },

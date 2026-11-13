@@ -19,6 +19,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      # 画面の E2E テスト。失敗したらデプロイしない
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - name: Upload E2E traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
       - name: Write service account key
         run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
       - name: Build & deploy

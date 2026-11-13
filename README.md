@@ -17,7 +17,15 @@ npm install
 npm run dev                  # http://localhost:5173
 npm run demo                 # http://localhost:5199 例データで全画面を表示（Firebase 不要、デザイン確認用）
 npm test                     # 日付・カテゴリの純粋関数のテスト
+npm run test:e2e             # 画面の E2E テスト（Playwright。例データの画面を Chromium と WebKit で操作）
+npm run test:e2e:ui          # 同上を、操作の様子を見ながら実行
 npm run build                # dist/ に出力
+```
+
+E2E テストを初めて実行する前に、ブラウザを取得する（1回だけ）。
+
+```bash
+npx playwright install chromium webkit
 ```
 
 ## 初回の Firebase 設定
