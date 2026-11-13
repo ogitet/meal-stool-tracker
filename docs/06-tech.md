@@ -63,7 +63,7 @@ flowchart LR
 | 層 | 採用 | 理由 |
 |---|---|---|
 | 言語 | TypeScript | データの形の誤りを書く段階で防げる |
-| ビルド | Vite | 設定が少なく、開発時の反映が速い |
+| ビルド | Vite+ 1.6（`vp`。Vite 8・Rolldown を同梱） | 設定が少なく、開発時の反映が速い。2026-11-13 に Vite 単体から移行し、開発・ビルド・テストを1つのツールにまとめた。`vite` は `overrides` で Vite+ の同梱版に向けている。Node は Volta で 26.13.1 に固定（`package.json` の `volta`） |
 | UI | React →Q35 | 情報と事例が多く、8画面規模の状態管理を素直に書ける |
 | 画面遷移 | React Router（データルーター） | URL と画面を対応させ、ブラウザの戻る操作に対応する。遷移の動きは View Transitions API で付ける（[src/hooks/useNav.ts](../src/hooks/useNav.ts)） |
 | キャッシュ | Vite のハッシュ付きファイル名（CSS・JS）、アイコンの `?v=` 、Hosting のヘッダー | `index.html` と `sw.js` は `no-cache`、`/assets/**` は1年の `immutable`。ファイル名が内容で変わるため、古い版を読み続けない。設定は [firebase.json](../firebase.json) と [vite.config.ts](../vite.config.ts) |
@@ -73,12 +73,12 @@ flowchart LR
 | スタイル | 素の CSS（CSS変数、1ファイルの `global.css`） | Surface の配色と寸法をそのまま変数にできる。UIライブラリは使わない。実装時に CSS Modules は使わず、クラス名の接頭辞で画面ごとに分けた（規模が小さく、1ファイルのほうが見通しがよい） |
 | PWA | vite-plugin-pwa | マニフェストと、画面のファイルをキャッシュする Service Worker を生成する |
 | 日付処理 | date-fns | 週の開始（月曜）、月の範囲などの計算を確実にする |
-| テスト | Vitest | 日付の計算、集計、食事枠の推定などの単純な関数に限って書く |
+| テスト | Vitest 5（Vite+ に同梱、`vp test`。import 元は `vite-plus/test`） | 日付の計算、集計、食事枠の推定などの単純な関数に限って書く |
 | 認証 | メールアドレスとパスワード →Q36 | 端末のパスワード管理機能と相性がよい |
 | 実行環境 | Node.js 24（インストール済み） | |
 | 構成管理 | Git（GitHub の非公開リポジトリ） →Q37 | |
 
-このフォルダは MAMP の公開フォルダ内にあるが、MAMP（PHP、MySQL）は使わない。開発中は Vite の開発サーバーで確認する。
+このフォルダは MAMP の公開フォルダ内にあるが、MAMP（PHP、MySQL）は使わない。開発中は Vite+ の開発サーバー（`npm run dev`、`vp dev`）で確認する。
 
 ---
 

@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, lazyPlugins, type Plugin } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHash } from "node:crypto";
@@ -40,7 +40,8 @@ function demoData(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [
+  // vp check・lint・fmt のときはプラグインを読み込まない（設定の評価を軽くする）
+  plugins: lazyPlugins(() => [
     ...(mode === "demo" ? [demoData()] : []),
     react(),
     iconCacheBuster(),
@@ -86,7 +87,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
     }),
-  ],
+  ]),
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
