@@ -5,17 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
+    "demo": "vp dev --mode demo --port 5199 --strictPort",
     "build": "tsc -b && vp build",
     "preview": "vp preview",
-    "test": "vp test run",
-    "icons": "node scripts/gen-icons.mjs",
-    "deploy": "npm run build && firebase deploy",
-    "demo": "vp dev --mode demo --port 5199 --strictPort",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
     "check": "vp check",
     "lint": "vp lint",
     "fmt": "vp fmt",
+    "test": "vp test run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "icons": "node scripts/gen-icons.mjs",
+    "deploy": "npm run build && firebase deploy",
     "prepare": "vp config"
   },
   "dependencies": {
