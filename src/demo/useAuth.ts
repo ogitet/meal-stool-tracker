@@ -9,7 +9,12 @@ export interface AuthState {
 /** `?login` を付けて開くと、ログアウトした状態から始まる。 */
 let user: User | null = new URLSearchParams(window.location.search).has("login") ? null : ({ uid: "demo" } as User);
 const listeners = new Set<() => void>();
-const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l); }; };
+const subscribe = (l: () => void) => {
+  listeners.add(l);
+  return () => {
+    listeners.delete(l);
+  };
+};
 
 export function useAuth(): AuthState {
   return { user: useSyncExternalStore(subscribe, () => user), loading: false };

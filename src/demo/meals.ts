@@ -28,7 +28,10 @@ export async function getMeal(_uid: string, id: string): Promise<Meal | null> {
 export async function createMeal(_uid: string, date: DateKey, slot: Slot, categoryIds: string[]): Promise<string> {
   const id = slot === "other" ? newId("m") : fixedMealId(date, slot);
   const now = new Date();
-  store.meals = [...store.meals.filter((m) => m.id !== id), { id, date, slot, categoryIds, createdAt: now, updatedAt: now }];
+  store.meals = [
+    ...store.meals.filter((m) => m.id !== id),
+    { id, date, slot, categoryIds, createdAt: now, updatedAt: now },
+  ];
   emit();
   return id;
 }
@@ -48,6 +51,8 @@ export async function findPreviousMeal(
   slot: Exclude<Slot, "other">,
   beforeDate: DateKey,
 ): Promise<Meal | null> {
-  const list = store.meals.filter((m) => m.slot === slot && m.date < beforeDate).sort((a, b) => (a.date < b.date ? 1 : -1));
+  const list = store.meals
+    .filter((m) => m.slot === slot && m.date < beforeDate)
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
   return list[0] ?? null;
 }

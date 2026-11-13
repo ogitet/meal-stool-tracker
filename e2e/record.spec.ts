@@ -110,7 +110,10 @@ test("削除の確認で「やめる」を選ぶと、記録は残る", async ({
 
 test("便の編集では日時を修正できる", async ({ page }) => {
   await page.goto(`/day/${today}`);
-  await page.locator(".dr", { has: page.locator(".tm") }).first().click();
+  await page
+    .locator(".dr", { has: page.locator(".tm") })
+    .first()
+    .click();
   await expect(page.locator("#stool-date")).toHaveValue(today);
   await page.locator("#stool-time").fill("06:45");
   await saveButton(page).click();
