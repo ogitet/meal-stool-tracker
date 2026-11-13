@@ -12,7 +12,11 @@
     "deploy": "npm run build && firebase deploy",
     "demo": "vp dev --mode demo --port 5199 --strictPort",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "check": "vp check",
+    "lint": "vp lint",
+    "fmt": "vp fmt",
+    "prepare": "vp config"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -34,8 +38,5 @@
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0"
-  },
-  "volta": {
-    "node": "26.13.1"
   }
 }

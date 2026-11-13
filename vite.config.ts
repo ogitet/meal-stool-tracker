@@ -40,6 +40,25 @@ function demoData(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
+  // 整形（oxfmt）。今の書き方に合わせ、差分が最も小さい幅 120 にする。設計書（docs/）は文書なので対象外
+  fmt: {
+    printWidth: 120,
+    singleQuote: false,
+    semi: true,
+    trailingComma: "all",
+    ignorePatterns: ["dist/**", "public/**", "docs/**", "package-lock.json"],
+  },
+  // lint（oxlint）。型情報を使うルールと型チェックも行う
+  lint: {
+    ignorePatterns: ["dist/**", "public/**"],
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
+    rules: { "vite-plus/prefer-vite-plus-imports": "error" },
+    options: { typeAware: true, typeCheck: true },
+  },
+  // コミット時に、ステージしたファイルだけを整形・修正する（.vite-hooks/pre-commit）
+  staged: {
+    "*": "vp check --fix",
+  },
   // vp check・lint・fmt のときはプラグインを読み込まない（設定の評価を軽くする）
   plugins: lazyPlugins(() => [
     ...(mode === "demo" ? [demoData()] : []),
