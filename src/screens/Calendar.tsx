@@ -48,21 +48,34 @@ export function Calendar() {
   // 期間を送った向き。新しい期間をその向きから入れる（0 は動きなし）
   const [dir, setDir] = useState<SwipeDir | 0>(0);
 
+  /**
+   * いまの URL から表示と基準日を読む。描画時の値（view、anchorKey）は、続けて操作すると
+   * 再描画の前で古いことがあるため、期間を送る計算には使わない。
+   */
+  function current(): { view: View; d: DateKey } {
+    const p = new URLSearchParams(window.location.search);
+    const d = p.get("d") ?? undefined;
+    return { view: p.get("view") === "month" ? "month" : "week", d: isDateKey(d) ? d : todayKey() };
+  }
+
   function update(next: { view?: View; d?: DateKey }) {
-    const p = new URLSearchParams(params);
-    p.set("view", next.view ?? view);
-    p.set("d", next.d ?? anchorKey);
+    const cur = current();
+    const p = new URLSearchParams(window.location.search);
+    p.set("view", next.view ?? cur.view);
+    p.set("d", next.d ?? cur.d);
     setParams(p, { replace: true });
   }
 
   const today = todayKey();
-  const shift = (n: number) => toKey(view === "week" ? shiftWeek(anchor, n) : shiftMonth(anchor, n));
   function go(n: SwipeDir) {
+    const cur = current();
+    const from = fromKey(cur.d);
     setDir(n);
-    update({ d: shift(n) });
+    update({ d: toKey(cur.view === "week" ? shiftWeek(from, n) : shiftMonth(from, n)) });
   }
   function goToday() {
-    setDir(today === anchorKey ? 0 : today > anchorKey ? 1 : -1);
+    const cur = current();
+    setDir(today === cur.d ? 0 : today > cur.d ? 1 : -1);
     update({ d: today });
   }
   const swipe = useSwipe(go);

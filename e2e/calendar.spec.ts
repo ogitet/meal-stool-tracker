@@ -15,8 +15,9 @@ test.describe("スワイプ", () => {
     await expect(page.locator(".rng")).toHaveText("11/16–22");
 
     await swipe(page, [100, 250], [260, 245]);
-    await expect.poll(() => anchorOf(page)).toBe("2026-11-11");
+    await expect(page.locator(".rng")).toHaveText("11/9–15");
     await expect(page.locator(".pager.from-l")).toBeVisible(); // 左から入る
+    expect(anchorOf(page)).toBe("2026-11-11");
     expect(errors).toEqual([]);
   });
 
@@ -36,9 +37,18 @@ test.describe("スワイプ", () => {
     await expect(page.locator(".rng")).toHaveAccessibleName("2026年12月");
 
     await swipe(page, [80, 300], [280, 300]);
-    await expect.poll(() => anchorOf(page)).toBe("2026-11-11");
+    await expect(page.locator(".rng")).toHaveAccessibleName("2026年11月");
     await swipe(page, [80, 300], [280, 300]);
-    await expect.poll(() => anchorOf(page)).toBe("2026-10-11");
+    await expect(page.locator(".rng")).toHaveAccessibleName("2026年10月");
+    expect(anchorOf(page)).toBe("2026-10-11");
+  });
+
+  test("続けて素早く払っても、払った回数だけ進む", async ({ page }) => {
+    await page.goto("/?view=month&d=2026-11-11");
+    await expect(page.locator(".rng")).toHaveAccessibleName("2026年11月");
+    // 再描画を待たずに3回払う
+    await Promise.all([1, 2, 3].map(() => swipe(page, [80, 300], [280, 300])));
+    await expect(page.locator(".rng")).toHaveAccessibleName("2026年8月");
   });
 
   test("払った直後に日付を開かない。普通のタップでは開く", async ({ page }) => {
