@@ -65,7 +65,9 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
         if (m) setSelected(m.categoryIds);
       })
       .catch(() => alive && setError("読み込めませんでした"));
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [uid, date, slot, otherId]);
 
   const isEdit = existing != null;
@@ -79,7 +81,9 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
     findPreviousMeal(uid, fixedSlot, date)
       .then((m) => alive && setPrevious(m))
       .catch(() => {});
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [uid, date, slot, isNewFixed]);
 
   // 表示するカテゴリ：使用中 ＋ 既存の記録に含まれる「使わない」カテゴリ（Structure 7章）
@@ -141,19 +145,38 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
   return (
     <div className="screen">
       <Header
-        left={<button type="button" className="lnk" onClick={back}>キャンセル</button>}
+        left={
+          <button type="button" className="lnk" onClick={back}>
+            キャンセル
+          </button>
+        }
         title={<DateTitle date={date} />}
-        right={isEdit ? <button type="button" className="lnk" onClick={() => setConfirm(true)}>削除</button> : null}
+        right={
+          isEdit ? (
+            <button type="button" className="lnk" onClick={() => setConfirm(true)}>
+              削除
+            </button>
+          ) : null
+        }
       />
 
       <div className="paper">
         {existing === undefined ? (
           <div className="slot" style={{ minHeight: 54 }} />
         ) : isEdit ? (
-          <div className="slot fixed">{SLOT_LABEL[slot]}<small>枠は変更できません</small></div>
+          <div className="slot fixed">
+            {SLOT_LABEL[slot]}
+            <small>枠は変更できません</small>
+          </div>
         ) : (
           <div className="slot">
-            <Segment options={slotOptions} value={slot} onChange={(v) => v && switchSlot(v)} className="slot" label="食事枠" />
+            <Segment
+              options={slotOptions}
+              value={slot}
+              onChange={(v) => v && switchSlot(v)}
+              className="slot"
+              label="食事枠"
+            />
           </div>
         )}
 
@@ -167,7 +190,8 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
               return (
                 <section key={g.id} aria-labelledby={`g-${g.id}`}>
                   <h2 id={`g-${g.id}`} className="gh">
-                    <i className={`sw g-${g.id}`} aria-hidden="true" />{g.label}
+                    <i className={`sw g-${g.id}`} aria-hidden="true" />
+                    {g.label}
                   </h2>
                   <div className="chips">
                     {items.map((c) => (
@@ -188,12 +212,18 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
               );
             })
           )}
-          {error && <div className="msg" role="alert">{error}</div>}
+          {error && (
+            <div className="msg" role="alert">
+              {error}
+            </div>
+          )}
         </div>
 
         <div className="bar">
           {isNewFixed && previous && (
-            <button type="button" className="btn out" onClick={copyPrevious}>前回をコピー</button>
+            <button type="button" className="btn out" onClick={copyPrevious}>
+              前回をコピー
+            </button>
           )}
           <button
             type="button"

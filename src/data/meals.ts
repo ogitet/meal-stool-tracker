@@ -102,7 +102,13 @@ export async function findPreviousMeal(
   slot: Exclude<Slot, "other">,
   beforeDate: DateKey,
 ): Promise<Meal | null> {
-  const q = query(col(uid), where("slot", "==", slot), where("date", "<", beforeDate), orderBy("date", "desc"), limit(1));
+  const q = query(
+    col(uid),
+    where("slot", "==", slot),
+    where("date", "<", beforeDate),
+    orderBy("date", "desc"),
+    limit(1),
+  );
   const snap = await getDocs(q);
   const first = snap.docs[0];
   return first ? fromDoc(first) : null;

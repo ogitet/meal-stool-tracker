@@ -27,7 +27,9 @@ export function useStoreVersion(): number {
   useEffect(() => {
     const l = () => setV((x) => x + 1);
     listeners.add(l);
-    return () => { listeners.delete(l); };
+    return () => {
+      listeners.delete(l);
+    };
   }, []);
   return v;
 }
@@ -42,14 +44,47 @@ export function newId(prefix: string): string {
 const DAYS: { b?: string[]; l?: string[]; d?: string[]; o?: string[][]; s?: Shape[] }[] = [
   // 0 = 今日
   { b: ["staple_bread", "protein_egg", "other_dairy", "other_coffee"], s: ["normal"] },
-  { b: ["staple_bread", "protein_egg", "other_dairy", "other_coffee"], l: ["staple_rice", "protein_pork", "vegetable_veg", "vegetable_mushroom"], d: ["staple_rice", "protein_pork", "vegetable_veg", "other_fried"], o: [["sweets_choco", "sweets_ice"]], s: ["normal"] },
+  {
+    b: ["staple_bread", "protein_egg", "other_dairy", "other_coffee"],
+    l: ["staple_rice", "protein_pork", "vegetable_veg", "vegetable_mushroom"],
+    d: ["staple_rice", "protein_pork", "vegetable_veg", "other_fried"],
+    o: [["sweets_choco", "sweets_ice"]],
+    s: ["normal"],
+  },
   { b: ["staple_noodle", "protein_pork", "vegetable_veg", "other_spicy"], s: ["diarrhea", "soft", "normal"] },
-  { b: ["staple_bread", "protein_egg", "vegetable_fruit", "other_coffee"], l: ["staple_rice", "protein_chicken", "vegetable_veg", "vegetable_seaweed", "other_fried"], d: ["staple_rice", "other_dairy"], o: [["sweets_cookie", "sweets_choco"]], s: ["normal"] },
-  { b: ["staple_rice", "protein_soy"], l: ["staple_noodle", "protein_beef", "vegetable_veg", "other_fried", "other_spicy"], d: ["other_alcohol", "other_dairy"], o: [["sweets_senbei", "sweets_gummy"], ["sweets_sweetbread"]], s: ["soft"] },
+  {
+    b: ["staple_bread", "protein_egg", "vegetable_fruit", "other_coffee"],
+    l: ["staple_rice", "protein_chicken", "vegetable_veg", "vegetable_seaweed", "other_fried"],
+    d: ["staple_rice", "other_dairy"],
+    o: [["sweets_cookie", "sweets_choco"]],
+    s: ["normal"],
+  },
+  {
+    b: ["staple_rice", "protein_soy"],
+    l: ["staple_noodle", "protein_beef", "vegetable_veg", "other_fried", "other_spicy"],
+    d: ["other_alcohol", "other_dairy"],
+    o: [["sweets_senbei", "sweets_gummy"], ["sweets_sweetbread"]],
+    s: ["soft"],
+  },
   {},
-  { b: ["staple_bread", "protein_egg", "other_coffee"], l: ["staple_rice", "protein_pork", "vegetable_veg", "vegetable_mushroom", "vegetable_fruit"], s: ["normal", "normal"] },
-  { b: ["staple_rice", "protein_fish", "vegetable_seaweed"], l: ["staple_noodle", "protein_chicken", "vegetable_veg"], d: ["other_fried", "other_alcohol"], o: [["sweets_chips", "sweets_ice"]], s: ["hard"] },
-  { b: ["staple_bread", "protein_egg", "other_dairy", "other_coffee"], l: ["staple_rice", "protein_pork", "vegetable_veg"], o: [["sweets_choco"]], s: ["normal"] },
+  {
+    b: ["staple_bread", "protein_egg", "other_coffee"],
+    l: ["staple_rice", "protein_pork", "vegetable_veg", "vegetable_mushroom", "vegetable_fruit"],
+    s: ["normal", "normal"],
+  },
+  {
+    b: ["staple_rice", "protein_fish", "vegetable_seaweed"],
+    l: ["staple_noodle", "protein_chicken", "vegetable_veg"],
+    d: ["other_fried", "other_alcohol"],
+    o: [["sweets_chips", "sweets_ice"]],
+    s: ["hard"],
+  },
+  {
+    b: ["staple_bread", "protein_egg", "other_dairy", "other_coffee"],
+    l: ["staple_rice", "protein_pork", "vegetable_veg"],
+    o: [["sweets_choco"]],
+    s: ["normal"],
+  },
   { l: ["staple_noodle", "protein_egg"], s: ["normal", "soft"] },
   { b: ["staple_rice", "protein_fish"], d: ["staple_rice", "protein_beef", "vegetable_veg"], s: ["normal"] },
   { b: ["staple_bread", "other_coffee"], s: ["soft"] },
@@ -68,7 +103,11 @@ function seed(): void {
       createdAt.setHours(7 + order * 4, 30, 0, 0);
       store.meals.push({
         id: slot === "other" ? newId("m") : `${date}_${slot}`,
-        date, slot, categoryIds: ids, createdAt, updatedAt: createdAt,
+        date,
+        slot,
+        categoryIds: ids,
+        createdAt,
+        updatedAt: createdAt,
       });
     };
     add("breakfast", day.b, 0);
@@ -79,7 +118,10 @@ function seed(): void {
       const occurredAt = new Date(d);
       occurredAt.setHours(8 + k * 5, 10, 0, 0);
       store.stools.push({
-        id: newId("s"), date, occurredAt, shape,
+        id: newId("s"),
+        date,
+        occurredAt,
+        shape,
         ...(k === 0 ? { amount: "large" as const, feeling: "clear" as const } : {}),
       });
     });

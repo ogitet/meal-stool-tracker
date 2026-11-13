@@ -52,18 +52,29 @@ export async function swipe(page: Page, from: [number, number], to: [number, num
         const el = document.elementFromPoint(x, y) ?? document.body;
         el.dispatchEvent(
           new PointerEvent(type, {
-            bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y,
-            pointerId: 1, pointerType: "mouse", isPrimary: true, button: type === "pointermove" ? -1 : 0, buttons,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            clientX: x,
+            clientY: y,
+            pointerId: 1,
+            pointerType: "mouse",
+            isPrimary: true,
+            button: type === "pointermove" ? -1 : 0,
+            buttons,
           }),
         );
         return el;
       };
       const down = fire("pointerdown", x0, y0, 1);
-      for (let i = 1; i <= steps; i++) fire("pointermove", x0 + ((x1 - x0) * i) / steps, y0 + ((y1 - y0) * i) / steps, 1);
+      for (let i = 1; i <= steps; i++)
+        fire("pointermove", x0 + ((x1 - x0) * i) / steps, y0 + ((y1 - y0) * i) / steps, 1);
       const up = fire("pointerup", x1, y1, 0);
       let common: Element | null = down;
       while (common && !common.contains(up)) common = common.parentElement;
-      (common ?? document.body).dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, clientX: x1, clientY: y1, detail: 1 }));
+      (common ?? document.body).dispatchEvent(
+        new MouseEvent("click", { bubbles: true, cancelable: true, clientX: x1, clientY: y1, detail: 1 }),
+      );
     },
     [from, to] as const,
   );

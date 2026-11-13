@@ -83,20 +83,60 @@ export function Calendar() {
   return (
     <div className="screen">
       <header className="hd cal-hd">
-        <Segment options={WEEK_MONTH} value={view} onChange={(v) => { if (v) { setDir(0); update({ view: v }); } }} className="sm" label="表示の切替" />
+        <Segment
+          options={WEEK_MONTH}
+          value={view}
+          onChange={(v) => {
+            if (v) {
+              setDir(0);
+              update({ view: v });
+            }
+          }}
+          className="sm"
+          label="表示の切替"
+        />
         <div className="nav">
-          <button type="button" className="arw" aria-label={view === "week" ? "前の週" : "前の月"} onClick={() => go(-1)}>‹</button>
+          <button
+            type="button"
+            className="arw"
+            aria-label={view === "week" ? "前の週" : "前の月"}
+            onClick={() => go(-1)}
+          >
+            ‹
+          </button>
           <h1 className="rng" aria-label={view === "week" ? formatWeekRange(anchor) : formatMonthJa(anchor)}>
-            {view === "week"
-              ? formatWeekRange(anchor).replace("〜", "–")
-              : <>{anchor.getFullYear()}<span className="u">年</span>{anchor.getMonth() + 1}<span className="u">月</span></>}
+            {view === "week" ? (
+              formatWeekRange(anchor).replace("〜", "–")
+            ) : (
+              <>
+                {anchor.getFullYear()}
+                <span className="u">年</span>
+                {anchor.getMonth() + 1}
+                <span className="u">月</span>
+              </>
+            )}
           </h1>
-          <button type="button" className="arw" aria-label={view === "week" ? "次の週" : "次の月"} onClick={() => go(1)}>›</button>
+          <button
+            type="button"
+            className="arw"
+            aria-label={view === "week" ? "次の週" : "次の月"}
+            onClick={() => go(1)}
+          >
+            ›
+          </button>
         </div>
-        <button type="button" className="pill" onClick={goToday}>今日</button>
+        <button type="button" className="pill" onClick={goToday}>
+          今日
+        </button>
         <button type="button" className="ico" aria-label="カテゴリ管理" onClick={() => nav.go("/categories", "push")}>
           <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path
+              d="M4 7h10M18 7h2M4 17h4M12 17h8"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
             <circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" strokeWidth="2" />
             <circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" strokeWidth="2" />
           </svg>
@@ -108,7 +148,10 @@ export function Calendar() {
           className={`track${swipe.dx ? " dragging" : ""}`}
           style={swipe.dx ? { transform: `translateX(${swipe.dx * 0.35}px)` } : undefined}
         >
-          <div key={`${view}${anchorKey}${retry}`} className={`pager${dir === 1 ? " from-r" : dir === -1 ? " from-l" : ""}`}>
+          <div
+            key={`${view}${anchorKey}${retry}`}
+            className={`pager${dir === 1 ? " from-r" : dir === -1 ? " from-l" : ""}`}
+          >
             {view === "week" ? (
               <WeekView anchor={anchor} today={today} onRetry={() => setRetry((n) => n + 1)} />
             ) : (
@@ -119,8 +162,12 @@ export function Calendar() {
       </div>
 
       <nav className="bar cal" aria-label="記録">
-        <button type="button" className="btn rec" onClick={() => nav.go(`/meal/${today}/${inferSlot()}`, "open")}>食事</button>
-        <button type="button" className="btn rec" onClick={() => nav.go(`/stool/new?date=${today}`, "open")}>便</button>
+        <button type="button" className="btn rec" onClick={() => nav.go(`/meal/${today}/${inferSlot()}`, "open")}>
+          食事
+        </button>
+        <button type="button" className="btn rec" onClick={() => nav.go(`/stool/new?date=${today}`, "open")}>
+          便
+        </button>
       </nav>
     </div>
   );
@@ -157,7 +204,10 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
         const isToday = key === today;
         const dayMeals: Meal[] = mealsBy.get(key) ?? [];
         const dayStools: Stool[] = stoolsBy.get(key) ?? [];
-        const tiles: Category[] = dayTiles(dayMeals.map((m) => m.categoryIds), categories.byId);
+        const tiles: Category[] = dayTiles(
+          dayMeals.map((m) => m.categoryIds),
+          categories.byId,
+        );
         const empty = !loading && dayMeals.length === 0 && dayStools.length === 0;
         return (
           <button
@@ -170,10 +220,21 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
             aria-label={`${d.getMonth() + 1}月${d.getDate()}日 ${weekdayJa(d)}曜日${isToday ? " 今日" : ""}`}
             onClick={() => nav.go(`/day/${key}`, "push")}
           >
-            <span className="dt"><span className="dn">{d.getDate()}</span><span className="wd">{weekdayJa(d)}</span></span>
-            <span className="stl">{dayStools.map((s) => <StoolMark key={s.id} shape={s.shape} size={18} />)}</span>
+            <span className="dt">
+              <span className="dn">{d.getDate()}</span>
+              <span className="wd">{weekdayJa(d)}</span>
+            </span>
+            <span className="stl">
+              {dayStools.map((s) => (
+                <StoolMark key={s.id} shape={s.shape} size={18} />
+              ))}
+            </span>
             <span className="fd">
-              {tiles.length > 0 ? <TileRow categories={tiles} /> : empty && !future ? <span className="none">未記録</span> : null}
+              {tiles.length > 0 ? (
+                <TileRow categories={tiles} />
+              ) : empty && !future ? (
+                <span className="none">未記録</span>
+              ) : null}
             </span>
           </button>
         );
@@ -194,7 +255,9 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
   return (
     <>
       <div className="mwd" aria-hidden="true">
-        {["月", "火", "水", "木", "金", "土", "日"].map((w) => <span key={w}>{w}</span>)}
+        {["月", "火", "水", "木", "金", "土", "日"].map((w) => (
+          <span key={w}>{w}</span>
+        ))}
       </div>
       <div className="mgrid" role="list" aria-busy={stools.loading}>
         {monthGrid(anchor).map((d) => {
@@ -202,7 +265,9 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
           const future = isFuture(key);
           const marks = stoolsBy.get(key) ?? [];
           const shown = marks.slice(0, 6);
-          const cls = ["mc", key === today ? "today" : "", isSameMonth(d, anchor) ? "" : "om", future ? "future" : ""].filter(Boolean).join(" ");
+          const cls = ["mc", key === today ? "today" : "", isSameMonth(d, anchor) ? "" : "om", future ? "future" : ""]
+            .filter(Boolean)
+            .join(" ");
           return (
             <button
               key={key}
@@ -216,7 +281,9 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
             >
               <span className="md">{d.getDate()}</span>
               <span className="mm">
-                {shown.map((s) => <StoolMark key={s.id} shape={s.shape} size={14} />)}
+                {shown.map((s) => (
+                  <StoolMark key={s.id} shape={s.shape} size={14} />
+                ))}
                 {marks.length > 6 && <span className="more">+{marks.length - 6}</span>}
               </span>
             </button>
