@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 // ↑ vp check の型チェックは .storybook に tsconfig の types を当てないため、CSS の読み込みの型をここで参照する
 import type { Decorator, Preview } from "@storybook/react-vite";
-import { useMemo } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router-dom";
 import { ToastProvider } from "../src/components/Toast";
 import { UserDataProvider } from "../src/data/UserDataContext";
@@ -19,6 +19,15 @@ function Navigated() {
   return <p style={{ padding: 24, fontSize: 14 }}>画面遷移：{pathname + search}</p>;
 }
 
+/**
+ * ルーターは URL が変わるときだけ作り直す。ストーリー本体は Context で渡し、
+ * controls で引数を変えたときにルーターの中まで再描画が届くようにする。
+ */
+const StoryElement = createContext<ReactNode>(null);
+function StorySlot() {
+  return useContext(StoryElement);
+}
+
 /** アプリと同じ前提（例データ、トースト、ルーター）で描画する。 */
 const withApp: Decorator = (Story, { parameters }) => {
   const route = (parameters.route as RouteParameter | undefined) ?? { path: "/", url: "/" };
@@ -26,18 +35,19 @@ const withApp: Decorator = (Story, { parameters }) => {
     () =>
       createMemoryRouter(
         [
-          { path: route.path, element: <Story /> },
+          { path: route.path, element: <StorySlot /> },
           { path: "*", element: <Navigated /> },
         ],
         { initialEntries: [route.url] },
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [route.path, route.url],
   );
   return (
     <UserDataProvider uid="demo">
       <ToastProvider>
-        <RouterProvider router={router} />
+        <StoryElement.Provider value={<Story />}>
+          <RouterProvider router={router} />
+        </StoryElement.Provider>
       </ToastProvider>
     </UserDataProvider>
   );
