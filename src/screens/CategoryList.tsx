@@ -13,7 +13,14 @@ export function CategoryList() {
 
   return (
     <div className="screen">
-      <Header left={<button type="button" className="lnk" onClick={() => nav.back("/")}>‹ 戻る</button>} title="カテゴリ管理" />
+      <Header
+        left={
+          <button type="button" className="lnk" onClick={() => nav.back("/")}>
+            ‹ 戻る
+          </button>
+        }
+        title="カテゴリ管理"
+      />
       <div className="paper">
         <div className="main">
           {categories.error ? (
@@ -30,8 +37,18 @@ export function CategoryList() {
                     <h2 className="sh">{g.label}</h2>
                     <div className="list" role="list">
                       {items.map((c) => (
-                        <button key={c.id} type="button" role="listitem" className="cr" onClick={() => nav.go(`/categories/${c.id}`, "push")}>
-                          <Tile category={c} /><span>{c.name}</span><span className="chev" aria-hidden="true">›</span>
+                        <button
+                          key={c.id}
+                          type="button"
+                          role="listitem"
+                          className="cr"
+                          onClick={() => nav.go(`/categories/${c.id}`, "push")}
+                        >
+                          <Tile category={c} />
+                          <span>{c.name}</span>
+                          <span className="chev" aria-hidden="true">
+                            ›
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -43,8 +60,18 @@ export function CategoryList() {
                   <h2 className="sh">使わない</h2>
                   <div className="list" role="list">
                     {inactive.map((c) => (
-                      <button key={c.id} type="button" role="listitem" className="cr off" onClick={() => nav.go(`/categories/${c.id}`, "push")}>
-                        <Tile category={c} /><span>{c.name}</span><span className="chev" aria-hidden="true">›</span>
+                      <button
+                        key={c.id}
+                        type="button"
+                        role="listitem"
+                        className="cr off"
+                        onClick={() => nav.go(`/categories/${c.id}`, "push")}
+                      >
+                        <Tile category={c} />
+                        <span>{c.name}</span>
+                        <span className="chev" aria-hidden="true">
+                          ›
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -54,7 +81,9 @@ export function CategoryList() {
           )}
         </div>
         <div className="bar">
-          <button type="button" className="btn pri" onClick={() => nav.go("/categories/new", "open")}>カテゴリを追加</button>
+          <button type="button" className="btn pri" onClick={() => nav.go("/categories/new", "open")}>
+            カテゴリを追加
+          </button>
         </div>
       </div>
     </div>

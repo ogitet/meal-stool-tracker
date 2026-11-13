@@ -27,7 +27,9 @@ export function Login() {
         <img className="logo" src="/icons/icon-192.png" alt="" width={72} height={72} />
         <h1 className="appname">ひびログ</h1>
         <p className="tagline">日々を、押していく。</p>
-        <label htmlFor="email" className="sr">メールアドレス</label>
+        <label htmlFor="email" className="sr">
+          メールアドレス
+        </label>
         <input
           id="email"
           className="inp"
@@ -39,7 +41,9 @@ export function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <label htmlFor="password" className="sr">パスワード</label>
+        <label htmlFor="password" className="sr">
+          パスワード
+        </label>
         <input
           id="password"
           className="inp"
@@ -53,7 +57,11 @@ export function Login() {
         <button type="submit" className="btn inv" disabled={busy}>
           {busy ? "ログインしています…" : "ログイン"}
         </button>
-        {error && <div className="msg" role="alert">{error}</div>}
+        {error && (
+          <div className="msg" role="alert">
+            {error}
+          </div>
+        )}
       </form>
     </div>
   );

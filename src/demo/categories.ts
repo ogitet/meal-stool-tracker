@@ -15,7 +15,13 @@ export function useCategories(_uid: string): CategoriesState {
   const v = useStoreVersion();
   return useMemo(() => {
     const all = sortCategories(store.categories);
-    return { all, active: all.filter((c) => c.active), byId: new Map(all.map((c) => [c.id, c])), loading: false, error: null };
+    return {
+      all,
+      active: all.filter((c) => c.active),
+      byId: new Map(all.map((c) => [c.id, c])),
+      loading: false,
+      error: null,
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v]);
 }

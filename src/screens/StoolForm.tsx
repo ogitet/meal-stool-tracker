@@ -56,7 +56,10 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
     getStool(uid, editId)
       .then((s) => {
         if (!alive) return;
-        if (!s) { setNotFound(true); return; }
+        if (!s) {
+          setNotFound(true);
+          return;
+        }
         setShape(s.shape);
         setAmount(s.amount ?? null);
         setFeeling(s.feeling ?? null);
@@ -65,7 +68,9 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
         setLoaded(true);
       })
       .catch(() => alive && setError("読み込めませんでした"));
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [uid, editId]);
 
   if (notFound) return <Navigate to="/" replace />;
@@ -79,8 +84,14 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   async function save() {
     if (busy || !shape) return;
     const at = occurredAt();
-    if (!at) { setError("日時の形式が正しくありません"); return; }
-    if (isFuture(toKey(at))) { setError("未来の日付は記録できません"); return; }
+    if (!at) {
+      setError("日時の形式が正しくありません");
+      return;
+    }
+    if (isFuture(toKey(at))) {
+      setError("未来の日付は記録できません");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -112,9 +123,19 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   return (
     <div className="screen">
       <Header
-        left={<button type="button" className="lnk" onClick={back}>キャンセル</button>}
+        left={
+          <button type="button" className="lnk" onClick={back}>
+            キャンセル
+          </button>
+        }
         title={<DateTitle date={newDate ?? dateStr} />}
-        right={editId ? <button type="button" className="lnk" onClick={() => setConfirm(true)}>削除</button> : null}
+        right={
+          editId ? (
+            <button type="button" className="lnk" onClick={() => setConfirm(true)}>
+              削除
+            </button>
+          ) : null
+        }
       />
       <div className="paper">
         <div className="main pad">
@@ -122,7 +143,9 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
             <Loading />
           ) : (
             <>
-              <div className="fl" id="lbl-shape">形状</div>
+              <div className="fl" id="lbl-shape">
+                形状
+              </div>
               <div className="chips" role="group" aria-labelledby="lbl-shape">
                 {SHAPES.map((s) => {
                   const on = shape === s;
@@ -135,22 +158,57 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
                 })}
               </div>
 
-              <div className="fl">量 <small>（任意）</small></div>
-              <Segment options={AMOUNTS.map((a) => ({ value: a, label: AMOUNT_LABEL[a] }))} value={amount} onChange={setAmount} optional label="量" />
+              <div className="fl">
+                量 <small>（任意）</small>
+              </div>
+              <Segment
+                options={AMOUNTS.map((a) => ({ value: a, label: AMOUNT_LABEL[a] }))}
+                value={amount}
+                onChange={setAmount}
+                optional
+                label="量"
+              />
 
-              <div className="fl">排便感 <small>（任意）</small></div>
-              <Segment options={FEELINGS.map((f) => ({ value: f, label: FEELING_LABEL[f] }))} value={feeling} onChange={setFeeling} optional label="排便感" />
+              <div className="fl">
+                排便感 <small>（任意）</small>
+              </div>
+              <Segment
+                options={FEELINGS.map((f) => ({ value: f, label: FEELING_LABEL[f] }))}
+                value={feeling}
+                onChange={setFeeling}
+                optional
+                label="排便感"
+              />
 
               {editId && (
                 <>
                   <div className="fl">日時</div>
                   <div className="dtrow">
-                    <input id="stool-date" className="inp num" type="date" value={dateStr} max={todayKey()} onChange={(e) => setDateStr(e.target.value)} aria-label="日付" />
-                    <input id="stool-time" className="inp num" type="time" value={timeStr} onChange={(e) => setTimeStr(e.target.value)} aria-label="時刻" />
+                    <input
+                      id="stool-date"
+                      className="inp num"
+                      type="date"
+                      value={dateStr}
+                      max={todayKey()}
+                      onChange={(e) => setDateStr(e.target.value)}
+                      aria-label="日付"
+                    />
+                    <input
+                      id="stool-time"
+                      className="inp num"
+                      type="time"
+                      value={timeStr}
+                      onChange={(e) => setTimeStr(e.target.value)}
+                      aria-label="時刻"
+                    />
                   </div>
                 </>
               )}
-              {error && <div className="msg" role="alert">{error}</div>}
+              {error && (
+                <div className="msg" role="alert">
+                  {error}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -161,7 +219,13 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
         </div>
       </div>
       {confirm && (
-        <ConfirmSheet message="この記録を削除しますか？" confirmLabel="削除する" busy={busy} onConfirm={remove} onCancel={() => setConfirm(false)} />
+        <ConfirmSheet
+          message="この記録を削除しますか？"
+          confirmLabel="削除する"
+          busy={busy}
+          onConfirm={remove}
+          onCancel={() => setConfirm(false)}
+        />
       )}
     </div>
   );

@@ -13,12 +13,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     timer.current = setTimeout(() => setMessage(null), 2000);
   }, []);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   return (
     <ToastContext.Provider value={show}>
       {children}
-      {message && <div className="toast" role="status">{message}</div>}
+      {message && (
+        <div className="toast" role="status">
+          {message}
+        </div>
+      )}
     </ToastContext.Provider>
   );
 }

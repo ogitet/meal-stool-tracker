@@ -30,10 +30,7 @@ export function StoolMark({ shape, size = 18, color }: { shape: Shape; size?: nu
         </>
       )}
       {shape === "diarrhea" && (
-        <path
-          d="M9 1.5C9 1.5 3.5 8.2 3.5 11.3a5.5 5.5 0 0 0 11 0C14.5 8.2 9 1.5 9 1.5Z"
-          fill="currentColor"
-        />
+        <path d="M9 1.5C9 1.5 3.5 8.2 3.5 11.3a5.5 5.5 0 0 0 11 0C14.5 8.2 9 1.5 9 1.5Z" fill="currentColor" />
       )}
     </svg>
   );

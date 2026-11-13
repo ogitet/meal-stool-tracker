@@ -9,13 +9,15 @@ export const GROUPS: { id: GroupId; label: string }[] = [
   { id: "sweets", label: "お菓子" },
 ];
 
-export const GROUP_LABEL: Record<GroupId, string> = Object.fromEntries(
-  GROUPS.map((g) => [g.id, g.label]),
-) as Record<GroupId, string>;
+export const GROUP_LABEL: Record<GroupId, string> = Object.fromEntries(GROUPS.map((g) => [g.id, g.label])) as Record<
+  GroupId,
+  string
+>;
 
-export const GROUP_INDEX: Record<GroupId, number> = Object.fromEntries(
-  GROUPS.map((g, i) => [g.id, i]),
-) as Record<GroupId, number>;
+export const GROUP_INDEX: Record<GroupId, number> = Object.fromEntries(GROUPS.map((g, i) => [g.id, i])) as Record<
+  GroupId,
+  number
+>;
 
 /** 初期カテゴリ 26種（Scope 5章 Q38）。id は固定し、再投入しても重複しないようにする。 */
 export const DEFAULT_CATEGORIES: Omit<Category, "active">[] = [

@@ -1,6 +1,6 @@
 name: CI
 
-# main への PR で単体テストとビルドを走らせる。マージの前に、ここが通っていることを確かめる。
+# main への PR で、整形・lint・型（vp check）、単体テスト、ビルドを走らせる。マージの前に、ここが通っていることを確かめる。
 # E2E テストは時間がかかるため CI では実行せず、PR を出す前に手元で実行する（npm run test:e2e）。
 on:
   pull_request:
@@ -14,14 +14,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      VP_GIT_HOOKS: "0" # CI では git フックを入れない（prepare の vp config を無効にする）
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Vite+ と Node（.node-version）を用意し、lockfile どおりに依存を入れる。
+      # 版は固定する（v1 タグは v1.15.0 で更新が止まっているため使わない）
+      - uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          node-version-file: package.json # volta.node（Volta の固定）を読む
-          cache: npm
-      - run: npm ci
+          node-version-file: .node-version
+          cache: true
+          run-install: |
+            - args: ['--frozen-lockfile']
+      - name: Format, lint & type check
+        run: vp check
       - name: Unit tests
-        run: npm test
+        run: vp test run
       - name: Type check & build
         run: npm run build

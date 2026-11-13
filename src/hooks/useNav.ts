@@ -37,7 +37,7 @@ export function useNav() {
     (to: string, motion: Motion = "push", options?: NavigateOptions) => {
       setMotion(motion);
       if (!options?.replace) motionAt.set(historyIdx() + 1, motion);
-      navigate(to, { ...options, viewTransition: motion !== "none" });
+      void navigate(to, { ...options, viewTransition: motion !== "none" });
     },
     [navigate],
   );
@@ -49,10 +49,10 @@ export function useNav() {
       const m = motion ?? REVERSE[motionAt.get(idx) ?? "push"];
       if (idx > 0) {
         pending = m;
-        navigate(-1);
+        void navigate(-1);
       } else {
         setMotion(m);
-        navigate(fallback, { replace: true, viewTransition: true });
+        void navigate(fallback, { replace: true, viewTransition: true });
       }
     },
     [navigate],

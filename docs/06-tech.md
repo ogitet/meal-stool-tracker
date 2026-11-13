@@ -63,7 +63,8 @@ flowchart LR
 | 層 | 採用 | 理由 |
 |---|---|---|
 | 言語 | TypeScript | データの形の誤りを書く段階で防げる |
-| ビルド | Vite+ 1.6（`vp`。Vite 8・Rolldown を同梱） | 設定が少なく、開発時の反映が速い。2026-11-13 に Vite 単体から移行し、開発・ビルド・テストを1つのツールにまとめた。`vite` は `overrides` で Vite+ の同梱版に向けている。Node は Volta で 26.13.1 に固定（`package.json` の `volta`） |
+| ビルド | Vite+ 1.6（`vp`。Vite 8・Rolldown を同梱） | 設定が少なく、開発時の反映が速い。2026-11-13 に Vite 単体から移行し、開発・ビルド・テストを1つのツールにまとめた。`vite` は `overrides` で Vite+ の同梱版に向けている。Node は 26.13.1 に固定。`.node-version`（Vite+ の推奨。CI の `setup-vp` が読む）と `package.json` の `volta`（手元の Volta が読む。Volta は `.node-version` を読まない）の2か所に同じ版を書く。Node を上げるときは両方を変える。ずれると単体テスト（[scripts/node-version.test.ts](../scripts/node-version.test.ts)）が失敗する |
+| 整形・lint | oxfmt・oxlint（Vite+ に同梱。`vp check`、設定は vite.config.ts） | 整形は幅 120・ダブルクォート・セミコロン（今の書き方に合わせた）。lint は型情報を使うルールと型チェックを含む。コミット時にステージしたファイルへ自動で適用し（`vp staged`、husky は使わない）、PR の CI でも確かめる |
 | UI | React →Q35 | 情報と事例が多く、8画面規模の状態管理を素直に書ける |
 | 画面遷移 | React Router（データルーター） | URL と画面を対応させ、ブラウザの戻る操作に対応する。遷移の動きは View Transitions API で付ける（[src/hooks/useNav.ts](../src/hooks/useNav.ts)） |
 | キャッシュ | Vite のハッシュ付きファイル名（CSS・JS）、アイコンの `?v=` 、Hosting のヘッダー | `index.html` と `sw.js` は `no-cache`、`/assets/**` は1年の `immutable`。ファイル名が内容で変わるため、古い版を読み続けない。設定は [firebase.json](../firebase.json) と [vite.config.ts](../vite.config.ts) |
