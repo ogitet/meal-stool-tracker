@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vp dev",
     "demo": "vp dev --mode demo --port 5199 --strictPort",
-    "build": "tsc -b && vp build",
+    "build": "vp build",
     "preview": "vp preview",
     "check": "vp check",
     "lint": "vp lint",
