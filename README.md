@@ -33,8 +33,9 @@ npx playwright install chromium webkit
 `main` には直接コミット・プッシュしない（GitHub の無料プランでは非公開リポジトリのブランチ保護が効かないため、運用の約束とする）。
 
 1. 作業用のブランチを作り、コミットしてプッシュする。
-2. `main` への PR を作る。PR で CI（単体テスト、ビルド、E2E テスト）が走る（[ci.yml](.github/workflows/ci.yml)）。
-3. CI が通ったことを確かめてマージする。マージすると本番にデプロイされる（[deploy.yml](.github/workflows/deploy.yml)）。
+2. PR を作る前に、手元で E2E テスト（`npm run test:e2e`）を実行する。時間がかかるため CI では実行しない。
+3. `main` への PR を作る。PR で CI（単体テスト、ビルド）が走る（[ci.yml](.github/workflows/ci.yml)）。
+4. CI が通ったことを確かめてマージする。マージすると本番にデプロイされる（[deploy.yml](.github/workflows/deploy.yml)）。
 
 ## 初回の Firebase 設定
 
