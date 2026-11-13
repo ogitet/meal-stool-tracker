@@ -1,6 +1,7 @@
 name: CI
 
-# main への PR でテストを走らせる。マージの前に、ここが通っていることを確かめる。
+# main への PR で単体テストとビルドを走らせる。マージの前に、ここが通っていることを確かめる。
+# E2E テストは時間がかかるため CI では実行せず、PR を出す前に手元で実行する（npm run test:e2e）。
 on:
   pull_request:
     branches: [main]
@@ -24,14 +25,3 @@ jobs:
         run: npm test
       - name: Type check & build
         run: npm run build
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
-      - name: E2E tests
-        run: npm run test:e2e
-      - name: Upload E2E traces
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-traces
-          path: test-results/
-          retention-days: 7

@@ -18,7 +18,7 @@ jobs:
           node-version-file: package.json # volta.node（Volta の固定）を読む
           cache: npm
       - run: npm ci
-      # E2E テストは PR の時点で実行する（ci.yml）。ここでは短い単体テストだけを最後の確認として残す
+      # E2E テストは PR を出す前に手元で実行する。ここでは短い単体テストだけを最後の確認として残す
       - run: npm test
       - name: Write service account key
         run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
