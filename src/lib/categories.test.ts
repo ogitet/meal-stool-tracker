@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { abbrIsOneChar, dayTiles, defaultAbbr, sortCategories } from "./categories";
 import { DEFAULT_CATEGORIES } from "./constants";
 import type { Category } from "./types";
