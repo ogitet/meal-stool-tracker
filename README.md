@@ -16,6 +16,8 @@ cp .env.example .env.local   # Firebase の設定値を記入
 npm install
 npm run dev                  # http://localhost:5173
 npm run demo                 # http://localhost:5199 例データで全画面を表示（Firebase 不要、デザイン確認用）
+npm run storybook            # http://localhost:6006 部品と画面のカタログ（Storybook。例データで表示、Firebase 不要）
+npm run build-storybook      # storybook-static/ に静的な Storybook を出力
 npm run check                # 整形・lint・型チェック（vp check。--fix で自動修正）
 npm run fmt                  # 整形（oxfmt）
 npm test                     # 単体テスト（日付・カテゴリの関数、Node の版の一致）

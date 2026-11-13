@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { demoData } from "./src/demo/vite-plugin";
 
 // アイコンの中身から作る版番号。iOS はホーム画面のアイコンを強くキャッシュするため、
 // URL を変えて取り直させる。アイコンを作り直せば、自動で値が変わる。
@@ -19,26 +20,6 @@ function iconCacheBuster(): Plugin {
   };
 }
 
-/**
- * デモモード（`vite --mode demo`）：src/data/* の読み込みを src/demo/* のメモリ内実装に差し替える。
- * Firebase に接続せず全画面を描画でき、デザインの確認に使う。本番ビルドには影響しない。
- */
-function demoData(): Plugin {
-  return {
-    name: "demo-data",
-    enforce: "pre",
-    async resolveId(source, importer, options) {
-      if (!importer || importer.includes("/src/demo/")) return null;
-      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
-      if (!resolved) return null;
-      if (/\/src\/data\/(useAuth|categories|meals|stools)\.ts$/.test(resolved.id)) {
-        return resolved.id.replace("/src/data/", "/src/demo/");
-      }
-      return resolved;
-    },
-  };
-}
-
 export default defineConfig(({ mode }) => ({
   // 整形（oxfmt）。今の書き方に合わせ、差分が最も小さい幅 120 にする。設計書（docs/）は文書なので対象外
   fmt: {
@@ -46,11 +27,11 @@ export default defineConfig(({ mode }) => ({
     singleQuote: false,
     semi: true,
     trailingComma: "all",
-    ignorePatterns: ["dist/**", "public/**", "docs/**", "package-lock.json"],
+    ignorePatterns: ["dist/**", "storybook-static/**", "public/**", "docs/**", "package-lock.json"],
   },
   // lint（oxlint）。型情報を使うルールと型チェックも行う
   lint: {
-    ignorePatterns: ["dist/**", "public/**"],
+    ignorePatterns: ["dist/**", "storybook-static/**", "public/**"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },

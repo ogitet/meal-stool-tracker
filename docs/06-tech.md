@@ -71,6 +71,7 @@ flowchart LR
 | 書体 | Google Fonts（Bodoni Moda、Zen Kaku Gothic Antique） | Surface 第2版の数字と印に使う。Service Worker で端末に保持する |
 | 画面のテスト | Playwright（`npm run test:e2e`、[e2e/](../e2e/)） | デモモードの画面を iPhone SE 相当の大きさで操作し、記録・編集・削除、カレンダーの移動とスワイプ、カテゴリ管理、ログイン後の遷移を確かめる。Chromium と、iPhone の Safari と同じ描画エンジンの WebKit で実行する。Firebase への読み書きと実機の操作感は対象外。実行時刻で結果が変わらないよう、ブラウザの時計を 2026-11-11 13:00 に固定する。スワイプは OS のマウスではなく、ページ内のポインターイベントで再現する（macOS の WebKit で並列実行するとマウスの座標がずれ、不安定になるため）。時間がかかるため CI では実行せず、PR を出す前に手元で実行する（2026-11-13 変更）。CI（ci.yml）は単体テストとビルドのみ。`main` へは直接プッシュせず、CI が通った PR をマージする運用とする（無料プランでは強制できないため、運用の約束） |
 | デザイン確認 | デモモード（`npm run demo`） | `src/data/*` を `src/demo/*` のメモリ内実装に差し替え、Firebase なしで全画面を例データで表示する。本番ビルドには含まれない |
+| 部品と画面のカタログ | Storybook 10（`npm run storybook`、[.storybook/](../.storybook/)） | 共通部品（便マーク、カテゴリの印、セグメントなど）と全画面を、iPhone SE の大きさ・デモ用の例データで確認する（`src/**/*.stories.tsx`）。デモモードと同じ差し替え（[src/demo/vite-plugin.ts](../src/demo/vite-plugin.ts)）で Firebase に接続せず、PWA のプラグインは外す。アクセシビリティの確認（addon-a11y）付き。Storybook が `vite-plus` を 0.x の任意の依存として宣言しているため、`overrides` で 1.6 にそろえている（2026-11-13 追加） |
 | スタイル | 素の CSS（CSS変数、1ファイルの `global.css`） | Surface の配色と寸法をそのまま変数にできる。UIライブラリは使わない。実装時に CSS Modules は使わず、クラス名の接頭辞で画面ごとに分けた（規模が小さく、1ファイルのほうが見通しがよい） |
 | PWA | vite-plugin-pwa | マニフェストと、画面のファイルをキャッシュする Service Worker を生成する |
 | 日付処理 | date-fns | 週の開始（月曜）、月の範囲などの計算を確実にする |
