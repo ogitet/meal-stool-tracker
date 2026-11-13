@@ -9,3 +9,5 @@ firebase-debug.log
 test-results/
 playwright-report/
 .vitest/
+storybook-static/
+*storybook.log

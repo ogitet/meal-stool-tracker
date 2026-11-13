@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vp dev",
     "demo": "vp dev --mode demo --port 5199 --strictPort",
+    "storybook": "storybook dev -p 6006 --no-open",
     "build": "vp build",
     "preview": "vp preview",
+    "build-storybook": "storybook build",
     "check": "vp check",
     "lint": "vp lint",
     "fmt": "vp fmt",
@@ -27,16 +29,23 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.65.0",
+    "@storybook/addon-a11y": "^10.6.7",
+    "@storybook/addon-docs": "^10.6.7",
+    "@storybook/react-vite": "^10.6.7",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^6.3.0",
     "firebase-tools": "^15.35.0",
+    "storybook": "^10.6.7",
     "typescript": "~5.8.0",
     "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
     "vite-plugin-pwa": "^1.0.0",
     "vite-plus": "1.6.0"
   },
   "overrides": {
+    "storybook": {
+      "vite-plus": "$vite-plus"
+    },
     "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0"
   },
   "volta": {
