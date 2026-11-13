@@ -39,7 +39,7 @@
     "@vitejs/plugin-react": "^6.3.0",
     "firebase-tools": "^15.35.0",
     "storybook": "^10.6.7",
-    "typescript": "~5.8.0",
+    "typescript": "~7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
     "vite-plugin-pwa": "^1.0.0",
     "vite-plus": "1.6.0"
