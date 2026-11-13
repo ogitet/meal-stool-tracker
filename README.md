@@ -28,6 +28,14 @@ E2E テストを初めて実行する前に、ブラウザを取得する（1回
 npx playwright install chromium webkit
 ```
 
+## 開発の流れ
+
+`main` には直接コミット・プッシュしない（GitHub の無料プランでは非公開リポジトリのブランチ保護が効かないため、運用の約束とする）。
+
+1. 作業用のブランチを作り、コミットしてプッシュする。
+2. `main` への PR を作る。PR で CI（単体テスト、ビルド、E2E テスト）が走る（[ci.yml](.github/workflows/ci.yml)）。
+3. CI が通ったことを確かめてマージする。マージすると本番にデプロイされる（[deploy.yml](.github/workflows/deploy.yml)）。
+
 ## 初回の Firebase 設定
 
 1. Authentication で「メール／パスワード」を有効にし、**ユーザー** タブから本人のアカウントを追加する。
