@@ -9,6 +9,7 @@ import { CategoryList } from "./CategoryList";
 import { DayDetail } from "./DayDetail";
 import { Login } from "./Login";
 import { MealForm } from "./MealForm";
+import { Stats } from "./Stats";
 import { StoolForm } from "./StoolForm";
 
 /**
@@ -100,6 +101,12 @@ export const CategoryNew: Story = {
   name: "S-08 カテゴリを追加",
   render: () => <CategoryEdit />,
   parameters: route("/categories/:id", "/categories/new"),
+};
+
+export const StatsThisMonth: Story = {
+  name: "S-09 集計",
+  render: () => <Stats />,
+  parameters: route("/stats", "/stats"),
 };
 
 export const LoginScreen: Story = {

@@ -943,6 +943,18 @@ p {
   line-height: 14px;
 }
 
+.mfoot {
+  display: flex;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.mfoot .lnk {
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
 /* 記録の開始 */
 .bar.cal {
   padding: 6px 8px calc(10px + env(safe-area-inset-bottom, 0px));
@@ -1132,6 +1144,108 @@ p {
 
 .cr.off .t {
   opacity: 0.45;
+}
+
+/* ---- 集計 ---- */
+.st-nav {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  padding-top: 8px;
+  color: var(--ink);
+}
+
+.st-nav .rng {
+  min-width: 120px;
+  margin: 0;
+}
+
+.arw:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+.st-sum {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.st-sum b {
+  margin: 0 2px 0 6px;
+  font-family: var(--font-num);
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  color: var(--ink);
+}
+
+.st-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 96px 40px;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+  border-bottom: 1px solid var(--line);
+}
+
+.st-row .nm {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-bar {
+  height: 8px;
+  overflow: hidden;
+  background: var(--paper-2);
+  border-radius: 4px;
+}
+
+.st-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.st-n {
+  font-family: var(--font-num);
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.st-n .u {
+  margin-left: 2px;
+  font-family: var(--font-jp);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.st-row.zero {
+  color: var(--muted);
+}
+
+.st-row.zero .t {
+  opacity: 0.45;
+}
+
+.st-row.zero .st-n {
+  font-weight: 400;
+}
+
+.st-note {
+  padding: 16px 16px 4px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
 }
 
 /* ---- フォーム ---- */

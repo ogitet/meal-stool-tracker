@@ -288,6 +288,11 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
           );
         })}
       </div>
+      <div className="mfoot">
+        <button type="button" className="lnk" onClick={() => nav.go(`/stats?d=${toKey(anchor)}`, "push")}>
+          この月の集計 ›
+        </button>
+      </div>
     </>
   );
 }
