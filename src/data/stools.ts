@@ -15,9 +15,9 @@ import {
   type DocumentSnapshot,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { toKey } from "../lib/date";
-import type { Amount, DateKey, Feeling, Shape, Stool } from "../lib/types";
+import { db } from "@/firebase";
+import { toKey } from "@/lib/date";
+import type { Amount, DateKey, Feeling, Shape, Stool } from "@/lib/types";
 import type { RangeState } from "./meals";
 import { guardedWrite } from "./write";
 

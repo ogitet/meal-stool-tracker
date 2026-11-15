@@ -1,18 +1,18 @@
 import { useMemo, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { DateTitle } from "../components/DateTitle";
-import { Header } from "../components/Header";
-import { ErrorRetry } from "../components/Status";
-import { StoolMark } from "../components/StoolMark";
-import { TileRow } from "../components/Tile";
-import { useMealsInRange } from "../data/meals";
-import { useStoolsInRange } from "../data/stools";
-import { useUserData } from "../data/UserDataContext";
-import { useNav } from "../hooks/useNav";
-import { AMOUNT_LABEL, displayName, FEELING_LABEL, FIXED_SLOTS, SHAPE_LABEL, SLOT_LABEL } from "../lib/constants";
-import { sortCategories } from "../lib/categories";
-import { formatTime, isDateKey, isFuture } from "../lib/date";
-import type { Category, Meal, Stool } from "../lib/types";
+import { DateTitle } from "@/components/DateTitle";
+import { Header } from "@/components/Header";
+import { ErrorRetry } from "@/components/Status";
+import { StoolMark } from "@/components/StoolMark";
+import { TileRow } from "@/components/Tile";
+import { useMealsInRange } from "@/data/meals";
+import { useStoolsInRange } from "@/data/stools";
+import { useUserData } from "@/data/UserDataContext";
+import { useNav } from "@/hooks/useNav";
+import { AMOUNT_LABEL, displayName, FEELING_LABEL, FIXED_SLOTS, SHAPE_LABEL, SLOT_LABEL } from "@/lib/constants";
+import { sortCategories } from "@/lib/categories";
+import { formatTime, isDateKey, isFuture } from "@/lib/date";
+import type { Category, Meal, Stool } from "@/lib/types";
 
 /** S-03 日別詳細。並びは Structure 3章（朝・昼・夕・その他・便）。 */
 export function DayDetail() {

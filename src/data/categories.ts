@@ -10,10 +10,10 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
-import { db } from "../firebase";
-import { DEFAULT_CATEGORIES } from "../lib/constants";
-import { sortCategories } from "../lib/categories";
-import type { Category, GroupId } from "../lib/types";
+import { db } from "@/firebase";
+import { DEFAULT_CATEGORIES } from "@/lib/constants";
+import { sortCategories } from "@/lib/categories";
+import type { Category, GroupId } from "@/lib/types";
 import { guardedWrite } from "./write";
 
 function col(uid: string) {

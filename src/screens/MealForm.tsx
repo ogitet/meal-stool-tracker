@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
-import { ConfirmSheet } from "../components/ConfirmSheet";
-import { DateTitle } from "../components/DateTitle";
-import { Header } from "../components/Header";
-import { Segment } from "../components/Segment";
-import { Loading } from "../components/Status";
-import { useToast } from "../components/Toast";
-import { createMeal, deleteMeal, findPreviousMeal, fixedMealId, getMeal, updateMealCategories } from "../data/meals";
-import { useUserData } from "../data/UserDataContext";
-import { writeErrorMessage } from "../data/write";
-import { useNav } from "../hooks/useNav";
-import { GROUPS, SLOT_LABEL, SLOTS } from "../lib/constants";
-import { isDateKey, isFuture } from "../lib/date";
-import type { Category, Meal, Slot } from "../lib/types";
+import { ConfirmSheet } from "@/components/ConfirmSheet";
+import { DateTitle } from "@/components/DateTitle";
+import { Header } from "@/components/Header";
+import { Segment } from "@/components/Segment";
+import { Loading } from "@/components/Status";
+import { useToast } from "@/components/Toast";
+import { createMeal, deleteMeal, findPreviousMeal, fixedMealId, getMeal, updateMealCategories } from "@/data/meals";
+import { useUserData } from "@/data/UserDataContext";
+import { writeErrorMessage } from "@/data/write";
+import { useNav } from "@/hooks/useNav";
+import { GROUPS, SLOT_LABEL, SLOTS } from "@/lib/constants";
+import { isDateKey, isFuture } from "@/lib/date";
+import type { Category, Meal, Slot } from "@/lib/types";
 
 interface CarriedState {
   selected?: string[];

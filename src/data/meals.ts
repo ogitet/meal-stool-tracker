@@ -17,8 +17,8 @@ import {
   type DocumentSnapshot,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import type { DateKey, Meal, Slot } from "../lib/types";
+import { db } from "@/firebase";
+import type { DateKey, Meal, Slot } from "@/lib/types";
 import { guardedWrite } from "./write";
 
 function col(uid: string) {

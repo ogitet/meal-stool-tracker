@@ -1,5 +1,5 @@
-import { fromKey, weekdayJa } from "../lib/date";
-import type { DateKey } from "../lib/types";
+import { fromKey, weekdayJa } from "@/lib/date";
+import type { DateKey } from "@/lib/types";
 
 /** ヘッダーの日付。数字は日めくりの数字、曜日は丸囲みで示す。 */
 export function DateTitle({ date }: { date: DateKey }) {

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { login, loginErrorMessage } from "../data/useAuth";
+import { login, loginErrorMessage } from "@/data/useAuth";
 
 /** S-01 ログイン。登録画面は設けない（Scope F-07）。 */
 export function Login() {
