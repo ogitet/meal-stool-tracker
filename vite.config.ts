@@ -38,6 +38,18 @@ export default defineConfig(({ mode }) => ({
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },
+    // src 内でフォルダーをまたぐ import は @/ で書く（同じフォルダー内の ./ は使える）
+    overrides: [
+      {
+        files: ["src/**"],
+        rules: {
+          "no-restricted-imports": [
+            "error",
+            { patterns: [{ regex: "^\\.\\./", message: "src 内は @/ から始まるパスで import する" }] },
+          ],
+        },
+      },
+    ],
   },
   // コミット時に、ステージしたファイルだけを整形・修正する（.vite-hooks/pre-commit）
   // パターンごとに並行で走るため、同じファイルが2つのパターンに当たらないように分ける（配列の中は順に実行される）
