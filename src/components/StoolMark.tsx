@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { SHAPE_LABEL } from "../lib/constants";
-import type { Shape } from "../lib/types";
+import { SHAPE_LABEL } from "@/lib/constants";
+import type { Shape } from "@/lib/types";
 
 /** 形ごとの図形。<svg> の直下に条件式で要素を書くと markuplint が誤検出するため、対応表にしている。 */
 const MARKS: Record<Shape, ReactNode> = {

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { toKey } from "../lib/date";
-import type { Amount, DateKey, Feeling, Shape, Stool } from "../lib/types";
+import { toKey } from "@/lib/date";
+import type { Amount, DateKey, Feeling, Shape, Stool } from "@/lib/types";
 import type { RangeState } from "./meals";
 import { emit, newId, store, useStoreVersion } from "./store";
 

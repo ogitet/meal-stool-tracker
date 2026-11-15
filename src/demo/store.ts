@@ -5,9 +5,9 @@
  */
 import { useEffect, useState } from "react";
 import { addDays } from "date-fns";
-import { DEFAULT_CATEGORIES } from "../lib/constants";
-import { toKey } from "../lib/date";
-import type { Category, Meal, Shape, Slot, Stool } from "../lib/types";
+import { DEFAULT_CATEGORIES } from "@/lib/constants";
+import { toKey } from "@/lib/date";
+import type { Category, Meal, Shape, Slot, Stool } from "@/lib/types";
 
 const listeners = new Set<() => void>();
 

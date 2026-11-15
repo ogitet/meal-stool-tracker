@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { format, isValid, parse } from "date-fns";
-import { ConfirmSheet } from "../components/ConfirmSheet";
-import { DateTitle } from "../components/DateTitle";
-import { Header } from "../components/Header";
-import { Segment } from "../components/Segment";
-import { Loading } from "../components/Status";
-import { StoolMark } from "../components/StoolMark";
-import { useToast } from "../components/Toast";
-import { createStool, deleteStool, getStool, updateStool } from "../data/stools";
-import { useUserData } from "../data/UserDataContext";
-import { writeErrorMessage } from "../data/write";
-import { useNav } from "../hooks/useNav";
-import { AMOUNT_LABEL, AMOUNTS, FEELING_LABEL, FEELINGS, SHAPE_LABEL, SHAPES } from "../lib/constants";
-import { initialOccurredAt, isDateKey, isFuture, todayKey, toKey } from "../lib/date";
-import type { Amount, Feeling, Shape } from "../lib/types";
+import { ConfirmSheet } from "@/components/ConfirmSheet";
+import { DateTitle } from "@/components/DateTitle";
+import { Header } from "@/components/Header";
+import { Segment } from "@/components/Segment";
+import { Loading } from "@/components/Status";
+import { StoolMark } from "@/components/StoolMark";
+import { useToast } from "@/components/Toast";
+import { createStool, deleteStool, getStool, updateStool } from "@/data/stools";
+import { useUserData } from "@/data/UserDataContext";
+import { writeErrorMessage } from "@/data/write";
+import { useNav } from "@/hooks/useNav";
+import { AMOUNT_LABEL, AMOUNTS, FEELING_LABEL, FEELINGS, SHAPE_LABEL, SHAPES } from "@/lib/constants";
+import { initialOccurredAt, isDateKey, isFuture, todayKey, toKey } from "@/lib/date";
+import type { Amount, Feeling, Shape } from "@/lib/types";
 
 /**
  * S-06 便記録。

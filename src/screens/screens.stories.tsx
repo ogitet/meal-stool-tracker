@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { addDays } from "date-fns";
 import type { RouteParameter } from "../../.storybook/preview";
-import { toKey } from "../lib/date";
+import { toKey } from "@/lib/date";
 import { Calendar } from "./Calendar";
 import { CategoryEdit } from "./CategoryEdit";
 import { CategoryList } from "./CategoryList";

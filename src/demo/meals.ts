@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { DateKey, Meal, Slot } from "../lib/types";
+import type { DateKey, Meal, Slot } from "@/lib/types";
 import { emit, newId, store, useStoreVersion } from "./store";
 
 export interface RangeState<T> {

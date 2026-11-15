@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { sortCategories } from "../lib/categories";
-import { DEFAULT_CATEGORIES } from "../lib/constants";
-import type { Category } from "../lib/types";
+import { sortCategories } from "@/lib/categories";
+import { DEFAULT_CATEGORIES } from "@/lib/constants";
+import type { Category } from "@/lib/types";
 import { Tile, TileRow } from "./Tile";
 
 const ALL: Category[] = sortCategories(DEFAULT_CATEGORIES.map((c) => ({ ...c, active: true })));

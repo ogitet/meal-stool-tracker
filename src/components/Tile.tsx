@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { GROUP_LABEL } from "../lib/constants";
-import type { Category } from "../lib/types";
+import { GROUP_LABEL } from "@/lib/constants";
+import type { Category } from "@/lib/types";
 
 /** 印（カテゴリ）。1文字の略称をグループのインク色で示す（Skeleton 3章）。 */
 export function Tile({

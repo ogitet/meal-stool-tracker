@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { AMOUNT_LABEL, AMOUNTS, SLOT_LABEL, SLOTS } from "../lib/constants";
+import { AMOUNT_LABEL, AMOUNTS, SLOT_LABEL, SLOTS } from "@/lib/constants";
 import { Segment } from "./Segment";
 
 const meta = {

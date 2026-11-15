@@ -1,6 +1,6 @@
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth } from "@/firebase";
 
 export interface AuthState {
   user: User | null;

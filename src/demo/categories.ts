@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { sortCategories } from "../lib/categories";
-import type { Category, GroupId } from "../lib/types";
+import { sortCategories } from "@/lib/categories";
+import type { Category, GroupId } from "@/lib/types";
 import { emit, newId, store, useStoreVersion } from "./store";
 
 export interface CategoriesState {

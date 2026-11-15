@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { toKey } from "../lib/date";
+import { toKey } from "@/lib/date";
 import { DateTitle } from "./DateTitle";
 import { Header } from "./Header";
 

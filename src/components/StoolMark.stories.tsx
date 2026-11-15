@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SHAPE_LABEL, SHAPES } from "../lib/constants";
+import { SHAPE_LABEL, SHAPES } from "@/lib/constants";
 import { StoolMark } from "./StoolMark";
 
 const meta = {

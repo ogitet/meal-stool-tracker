@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Segment } from "../components/Segment";
-import { ErrorRetry } from "../components/Status";
-import { StoolMark } from "../components/StoolMark";
-import { TileRow } from "../components/Tile";
-import { useMealsInRange } from "../data/meals";
-import { useStoolsInRange } from "../data/stools";
-import { useUserData } from "../data/UserDataContext";
-import { useNav } from "../hooks/useNav";
-import { useSwipe, type SwipeDir } from "../hooks/useSwipe";
-import { dayTiles } from "../lib/categories";
+import { Segment } from "@/components/Segment";
+import { ErrorRetry } from "@/components/Status";
+import { StoolMark } from "@/components/StoolMark";
+import { TileRow } from "@/components/Tile";
+import { useMealsInRange } from "@/data/meals";
+import { useStoolsInRange } from "@/data/stools";
+import { useUserData } from "@/data/UserDataContext";
+import { useNav } from "@/hooks/useNav";
+import { useSwipe, type SwipeDir } from "@/hooks/useSwipe";
+import { dayTiles } from "@/lib/categories";
 import {
   formatMonthJa,
   formatWeekRange,
@@ -27,8 +27,8 @@ import {
   weekDays,
   weekdayJa,
   weekRange,
-} from "../lib/date";
-import type { Category, DateKey, Meal, Stool } from "../lib/types";
+} from "@/lib/date";
+import type { Category, DateKey, Meal, Stool } from "@/lib/types";
 
 type View = "week" | "month";
 

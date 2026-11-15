@@ -1,9 +1,9 @@
-import { Header } from "../components/Header";
-import { ErrorRetry, Loading } from "../components/Status";
-import { Tile } from "../components/Tile";
-import { useUserData } from "../data/UserDataContext";
-import { useNav } from "../hooks/useNav";
-import { GROUPS } from "../lib/constants";
+import { Header } from "@/components/Header";
+import { ErrorRetry, Loading } from "@/components/Status";
+import { Tile } from "@/components/Tile";
+import { useUserData } from "@/data/UserDataContext";
+import { useNav } from "@/hooks/useNav";
+import { GROUPS } from "@/lib/constants";
 
 /** S-07 カテゴリ管理。グループごとに一覧し、「使わない」は末尾にまとめる。 */
 export function CategoryList() {

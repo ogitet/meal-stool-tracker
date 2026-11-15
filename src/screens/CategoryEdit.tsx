@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { Header } from "../components/Header";
-import { Loading } from "../components/Status";
-import { useToast } from "../components/Toast";
-import { addCategory, isDuplicateName, updateCategory } from "../data/categories";
-import { useUserData } from "../data/UserDataContext";
-import { writeErrorMessage } from "../data/write";
-import { useNav } from "../hooks/useNav";
-import { abbrIsOneChar, defaultAbbr } from "../lib/categories";
-import { CATEGORY_NAME_MAX, GROUPS } from "../lib/constants";
-import type { GroupId } from "../lib/types";
+import { Header } from "@/components/Header";
+import { Loading } from "@/components/Status";
+import { useToast } from "@/components/Toast";
+import { addCategory, isDuplicateName, updateCategory } from "@/data/categories";
+import { useUserData } from "@/data/UserDataContext";
+import { writeErrorMessage } from "@/data/write";
+import { useNav } from "@/hooks/useNav";
+import { abbrIsOneChar, defaultAbbr } from "@/lib/categories";
+import { CATEGORY_NAME_MAX, GROUPS } from "@/lib/constants";
+import type { GroupId } from "@/lib/types";
 
 /** S-08 カテゴリ編集。/categories/new で追加、/categories/:id で編集。 */
 export function CategoryEdit() {
