@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { demoData } from "./src/demo/vite-plugin";
 
 // アイコンの中身から作る版番号。iOS はホーム画面のアイコンを強くキャッシュするため、
@@ -21,6 +22,8 @@ function iconCacheBuster(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
+  // src 内の import は @/ から書く（型チェック用に、tsconfig.app.json の paths にも同じ対応を書いている）
+  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   // 整形（oxfmt）。今の書き方に合わせ、差分が最も小さい幅 120 にする。設計書（docs/）は文書なので対象外
   fmt: {
     printWidth: 120,
