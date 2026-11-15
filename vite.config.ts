@@ -70,6 +70,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         // 画面のファイルのみキャッシュする。Firestore への通信はキャッシュしない。
         globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
+        // 共有用の画像（OGP）は画面で使わないため、端末に保持しない
+        globIgnores: ["og-image.png"],
         navigateFallback: "/index.html",
         // Web フォント（Google Fonts）は初回の取得後、端末に保持する。
         runtimeCaching: [
