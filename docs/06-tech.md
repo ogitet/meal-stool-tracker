@@ -73,6 +73,7 @@ flowchart LR
 | デザイン確認 | デモモード（`npm run demo`） | `src/data/*` を `src/demo/*` のメモリ内実装に差し替え、Firebase なしで全画面を例データで表示する。本番ビルドには含まれない |
 | 部品と画面のカタログ | Storybook 10（`npm run storybook`、[.storybook/](../.storybook/)） | 共通部品（便マーク、カテゴリの印、セグメントなど）と全画面を、iPhone SE の大きさ・デモ用の例データで確認する（`src/**/*.stories.tsx`）。デモモードと同じ差し替え（[src/demo/vite-plugin.ts](../src/demo/vite-plugin.ts)）で Firebase に接続せず、PWA のプラグインは外す。アクセシビリティの確認（addon-a11y）付き。Storybook が `vite-plus` を 0.x の任意の依存として宣言しているため、`overrides` で 1.6 にそろえている（2026-11-13 追加） |
 | スタイル | 素の CSS（CSS変数、1ファイルの `global.css`） | Surface の配色と寸法をそのまま変数にできる。UIライブラリは使わない。実装時に CSS Modules は使わず、クラス名の接頭辞で画面ごとに分けた（規模が小さく、1ファイルのほうが見通しがよい） |
+| HTML・CSS の検査 | markuplint、stylelint（`npm run markuplint`、`npm run stylelint`） | markuplint は `index.html` と JSX の要素・属性・ARIA の誤りを、stylelint は CSS の誤りとプロパティの並び順を検査する。CI でも実行する。markuplint の JSX パーサーが TypeScript の JS API を使うため、TypeScript は 6 系に留める（2026-11-15 追加） |
 | PWA | vite-plugin-pwa | マニフェストと、画面のファイルをキャッシュする Service Worker を生成する |
 | 日付処理 | date-fns | 週の開始（月曜）、月の範囲などの計算を確実にする |
 | テスト | Vitest 5（Vite+ に同梱、`vp test`。import 元は `vite-plus/test`） | 日付の計算、集計、食事枠の推定などの単純な関数に限って書く |
