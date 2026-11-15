@@ -35,12 +35,11 @@ export function CategoryList() {
                 return (
                   <section key={g.id}>
                     <h2 className="sh">{g.label}</h2>
-                    <div className="list" role="list">
+                    <div className="list">
                       {items.map((c) => (
                         <button
                           key={c.id}
                           type="button"
-                          role="listitem"
                           className="cr"
                           onClick={() => nav.go(`/categories/${c.id}`, "push")}
                         >
@@ -58,12 +57,11 @@ export function CategoryList() {
               {inactive.length > 0 && (
                 <section>
                   <h2 className="sh">使わない</h2>
-                  <div className="list" role="list">
+                  <div className="list">
                     {inactive.map((c) => (
                       <button
                         key={c.id}
                         type="button"
-                        role="listitem"
                         className="cr off"
                         onClick={() => nav.go(`/categories/${c.id}`, "push")}
                       >

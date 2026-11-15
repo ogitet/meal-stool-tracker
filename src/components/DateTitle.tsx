@@ -5,9 +5,14 @@ import type { DateKey } from "../lib/types";
 export function DateTitle({ date }: { date: DateKey }) {
   const d = fromKey(date);
   return (
-    <span className="dtt" aria-label={`${d.getMonth() + 1}月${d.getDate()}日 ${weekdayJa(d)}曜日`}>
-      <span className="d">{d.getMonth() + 1}</span>月<span className="d">{d.getDate()}</span>日
-      <span className="wk">{weekdayJa(d)}</span>
+    <span className="dtt">
+      <span className="sr">{`${d.getMonth() + 1}月${d.getDate()}日 ${weekdayJa(d)}曜日`}</span>
+      <span aria-hidden="true">
+        <span className="d">{d.getMonth() + 1}</span>月<span className="d">{d.getDate()}</span>日
+      </span>
+      <span className="wk" aria-hidden="true">
+        {weekdayJa(d)}
+      </span>
     </span>
   );
 }

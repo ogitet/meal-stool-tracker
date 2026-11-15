@@ -37,8 +37,11 @@ export default defineConfig(({ mode }) => ({
     options: { typeAware: true, typeCheck: true },
   },
   // コミット時に、ステージしたファイルだけを整形・修正する（.vite-hooks/pre-commit）
+  // パターンごとに並行で走るため、同じファイルが2つのパターンに当たらないように分ける（配列の中は順に実行される）
   staged: {
-    "*": "vp check --fix",
+    "*.css": ["vp check --fix", "stylelint"],
+    "{*.tsx,index.html}": ["vp check --fix", "markuplint"],
+    "!(*.css|*.tsx|index.html)": "vp check --fix",
   },
   // vp check・lint・fmt のときはプラグインを読み込まない（設定の評価を軽くする）
   plugins: lazyPlugins(() => [
@@ -67,6 +70,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         // 画面のファイルのみキャッシュする。Firestore への通信はキャッシュしない。
         globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
+        // 共有用の画像（OGP）は画面で使わないため、端末に保持しない
+        globIgnores: ["og-image.png"],
         navigateFallback: "/index.html",
         // Web フォント（Google Fonts）は初回の取得後、端末に保持する。
         runtimeCaching: [

@@ -1,0 +1,8 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-recess-order"],
+  "rules": {
+    "value-keyword-case": ["lower", { "camelCaseSvgKeywords": true, "ignoreProperties": ["/^--font/", "font-family"] }],
+    "property-no-vendor-prefix": [true, { "ignoreProperties": ["/text-size-adjust/"] }],
+    "no-descending-specificity": null
+  }
+}

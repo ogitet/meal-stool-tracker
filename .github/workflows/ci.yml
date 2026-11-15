@@ -1,6 +1,6 @@
 name: CI
 
-# main への PR で、整形・lint・型（vp check）、単体テスト、ビルド、E2E、Firestore ルールのテストを走らせる。
+# main への PR で、整形・lint・型（vp check）、HTML と CSS の lint（markuplint・stylelint）、単体テスト、ビルド、E2E、Firestore ルールのテストを走らせる。
 # マージの前に、ここが通っていることを確かめる。
 on:
   pull_request:
@@ -33,6 +33,10 @@ jobs:
             - args: ['--frozen-lockfile']
       - name: Format, lint & type check
         run: vp check
+      - name: HTML lint (markuplint)
+        run: npm run markuplint
+      - name: CSS lint (stylelint)
+        run: npm run stylelint
       - name: Unit tests
         run: vp test run
       - name: Type check & build

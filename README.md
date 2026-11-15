@@ -19,6 +19,8 @@ npm run demo                 # http://localhost:5199 例データで全画面を
 npm run storybook            # http://localhost:6006 部品と画面のカタログ（Storybook。例データで表示、Firebase 不要）
 npm run build-storybook      # storybook-static/ に静的な Storybook を出力
 npm run check                # 整形・lint・型チェック（vp check。--fix で自動修正）
+npm run markuplint           # HTML・JSX の lint
+npm run stylelint            # CSS の lint（-- --fix で自動修正）
 npm run fmt                  # 整形（oxfmt）
 npm test                     # 単体テスト（日付・カテゴリの関数、Node の版の一致）
 npm run test:rules           # firestore.rules のテスト（Firestore エミュレーターで実行。Java 21 以上が必要）
@@ -37,8 +39,8 @@ npx playwright install chromium webkit
 
 `main` には直接コミット・プッシュしない（GitHub の無料プランでは非公開リポジトリのブランチ保護が効かないため、運用の約束とする）。
 
-1. 作業用のブランチを作り、コミットしてプッシュする。コミットのとき、ステージしたファイルが自動で整形・lint される（`.vite-hooks/pre-commit` の `vp staged`。`npm install` で有効になる）。lint や型のエラーがあるとコミットできない。
-2. `main` への PR を作る。PR で CI（整形・lint・型、単体テスト、ビルド、E2E テスト、Firestore ルールのテスト）が走る（[ci.yml](.github/workflows/ci.yml)）。
+1. 作業用のブランチを作り、コミットしてプッシュする。コミットのとき、ステージしたファイルが自動で整形・lint され、CSS には stylelint、TSX と `index.html` には markuplint も走る（`.vite-hooks/pre-commit` の `vp staged`。`npm install` で有効になる）。lint や型のエラーがあるとコミットできない。
+2. `main` への PR を作る。PR で CI（整形・lint・型、HTML と CSS の lint、単体テスト、ビルド、E2E テスト、Firestore ルールのテスト）が走る（[ci.yml](.github/workflows/ci.yml)）。
 3. CI が通ったことを確かめてマージする。マージすると本番にデプロイされる（[deploy.yml](.github/workflows/deploy.yml)）。
 
 ## 初回の Firebase 設定

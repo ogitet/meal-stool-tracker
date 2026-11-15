@@ -1,4 +1,5 @@
-// PWA のアイコンを生成する。外部ライブラリを使わず、図形の距離関数で描いて PNG に書き出す。
+// PWA のアイコン、favicon（SVG）、共有用の画像（OGP）を生成する。絵柄は外部ライブラリを使わず、図形の距離関数で描いて PNG に書き出す。
+// 共有用の画像の文字だけは、Playwright の Chromium でアプリと同じ書体（Google Fonts。通信が必要）を使って描く。
 // 絵柄：空色の地に、にっこり顔の日めくり1枚と小さな判子（docs/05-surface.md 8章）。
 // 食事や便を連想させない抽象的な絵柄にする。
 import { deflateSync } from "node:zlib";
@@ -76,7 +77,7 @@ const stampDot = circle(tx, ty, 2.8);
 
 // 背景：上から下へ、ごく淡い空色のグラデーション
 const bg = (y) => {
-  const t = y / 100,
+  const t = Math.min(1, Math.max(0, y / 100)),
     a = hex("#d9e5fa"),
     b = hex("#c3d5f3");
   return a.map((v, i) => Math.round(v + (b[i] - v) * t));
@@ -137,23 +138,25 @@ function chunk(type, data) {
   crc.writeUInt32BE(crc32(td));
   return Buffer.concat([len, td, crc]);
 }
-function icon(size) {
+// 幅 w・高さ h の画像に、一辺 art の絵柄を描く。左端は ox（既定は中央）、上下は中央。絵柄の外側は、端の色を延ばした地になる。
+function image(w, h, art = Math.min(w, h), ox = (w - art) / 2) {
   const SS = 4; // 4×4 のスーパーサンプリング
-  const raw = Buffer.alloc((size * 3 + 1) * size);
-  for (let y = 0; y < size; y++) {
-    raw[y * (size * 3 + 1)] = 0;
-    for (let x = 0; x < size; x++) {
+  const oy = (h - art) / 2;
+  const raw = Buffer.alloc((w * 3 + 1) * h);
+  for (let y = 0; y < h; y++) {
+    raw[y * (w * 3 + 1)] = 0;
+    for (let x = 0; x < w; x++) {
       let r = 0,
         g = 0,
         b = 0;
       for (let j = 0; j < SS; j++)
         for (let i = 0; i < SS; i++) {
-          const [pr, pg, pb] = shade(((x + (i + 0.5) / SS) / size) * 100, ((y + (j + 0.5) / SS) / size) * 100);
+          const [pr, pg, pb] = shade(((x - ox + (i + 0.5) / SS) / art) * 100, ((y - oy + (j + 0.5) / SS) / art) * 100);
           r += pr;
           g += pg;
           b += pb;
         }
-      const o = y * (size * 3 + 1) + 1 + x * 3,
+      const o = y * (w * 3 + 1) + 1 + x * 3,
         n = SS * SS;
       raw[o] = Math.round(r / n);
       raw[o + 1] = Math.round(g / n);
@@ -161,8 +164,8 @@ function icon(size) {
     }
   }
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(size, 0);
-  ihdr.writeUInt32BE(size, 4);
+  ihdr.writeUInt32BE(w, 0);
+  ihdr.writeUInt32BE(h, 4);
   ihdr[8] = 8;
   ihdr[9] = 2;
   return Buffer.concat([
@@ -173,8 +176,72 @@ function icon(size) {
   ]);
 }
 
+const icon = (size) => image(size, size);
+
+// ---- favicon（SVG）----
+// 上の図形と同じ座標（100×100）で書く。影のぼかしは省く。
+const f = (n) => Number(n.toFixed(2));
+const rgb = (c) => `#${c.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+const dot = ([x, y], r, color, extra = "") =>
+  `<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="${rgb(color)}"${extra}/>`;
+function favicon() {
+  const { cx, cy, hw, hh, deg } = SLIP;
+  const [a0x, a0y] = [sx + 7.5 * Math.cos(rad(152)), sy + 3.5 + 7.5 * Math.sin(rad(152))];
+  const [a1x, a1y] = [sx + 7.5 * Math.cos(rad(28)), sy + 3.5 + 7.5 * Math.sin(rad(28))];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9e5fa"/><stop offset="1" stop-color="#c3d5f3"/></linearGradient>
+    <clipPath id="slip"><rect x="${-hw}" y="${-hh}" width="${hw * 2}" height="${hh * 2}" rx="12"/></clipPath>
+  </defs>
+  <rect width="100" height="100" fill="url(#bg)"/>
+  <g transform="translate(${cx} ${cy}) rotate(${deg})">
+    <rect x="${-hw}" y="${-hh}" width="${hw * 2}" height="${hh * 2}" rx="12" fill="#fff"/>
+    <rect x="${-hw}" y="${-hh}" width="${hw * 2}" height="14" fill="${rgb(PINK)}" clip-path="url(#slip)"/>
+  </g>
+  ${[-14, 14].map((u) => dot(inSlip(u, -SLIP.hh + 4), 2.3, WHITE)).join("")}
+  ${[-19, 19].map((u) => dot(inSlip(u, 14.5), 4.4, PINK, ' fill-opacity="0.8"')).join("")}
+  ${[-10.5, 10.5].map((u) => dot(inSlip(u, 7), 3.1, INK)).join("")}
+  <path d="M${f(a0x)} ${f(a0y)}A7.5 7.5 0 0 0 ${f(a1x)} ${f(a1y)}" fill="none" stroke="${rgb(INK)}" stroke-width="2.6" stroke-linecap="round"/>
+  <g transform="translate(${f(tx)} ${f(ty)}) rotate(10)"><rect x="-8.5" y="-8.5" width="17" height="17" rx="3" fill="${rgb(YELLOW)}"/></g>
+  ${dot([tx, ty], 2.8, WHITE, ' fill-opacity="0.95"')}
+</svg>
+`;
+}
+
 mkdirSync("public/icons", { recursive: true });
 writeFileSync("public/icons/icon-192.png", icon(192));
 writeFileSync("public/icons/icon-512.png", icon(512));
 writeFileSync("public/icons/apple-touch-icon.png", icon(180));
-console.log("icons written to public/icons/");
+writeFileSync("public/favicon.svg", favicon());
+
+// 共有用の画像（OGP、1200×630）。左に絵柄、右にアプリ名を置く。
+// 絵柄は上と同じ描き方の PNG を背景に敷き、文字だけをブラウザーで重ねて撮る。
+const OG_TEXT = "ひびログ";
+const OG_FONT = "Zen Kaku Gothic Antique";
+async function ogImage() {
+  const { chromium } = await import("@playwright/test");
+  const bgPng = image(1200, 630, 460, 80).toString("base64");
+  const fontUrl = `https://fonts.googleapis.com/css2?family=${OG_FONT.replaceAll(" ", "+")}:wght@900&text=${encodeURIComponent(OG_TEXT)}`;
+  const html = `<!doctype html><html lang="ja"><head><meta charset="UTF-8"><link rel="stylesheet" href="${fontUrl}"><style>
+    html, body { margin: 0; }
+    body { width: 1200px; height: 630px; background: url(data:image/png;base64,${bgPng}); }
+    p { position: absolute; left: 570px; top: 0; margin: 0; line-height: 630px; white-space: nowrap;
+      font: 900 138px/630px "${OG_FONT}"; letter-spacing: 0.02em; color: ${rgb(INK)}; }
+  </style></head><body><p>${OG_TEXT}</p></body></html>`;
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+    await page.setContent(html, { waitUntil: "networkidle" });
+    // 書体を取得できなかったときは、代わりの書体で描かずに止める
+    const loaded = await page.evaluate(
+      async ([font, text]) => (await document.fonts.load(`900 138px "${font}"`, text)).length > 0,
+      [OG_FONT, OG_TEXT],
+    );
+    if (!loaded) throw new Error(`書体「${OG_FONT}」を取得できませんでした（通信を確認してください）`);
+    await page.screenshot({ path: "public/og-image.png" });
+  } finally {
+    await browser.close();
+  }
+}
+await ogImage();
+console.log("icons written to public/icons/, public/og-image.png, public/favicon.svg");

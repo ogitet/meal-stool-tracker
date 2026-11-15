@@ -14,6 +14,9 @@ updates:
       # Vite+ は vite の別名・overrides・CI の setup-vp と版をそろえる必要があるため、手で上げる
       - dependency-name: vite
       - dependency-name: vite-plus
+      # markuplint の JSX パーサーが TypeScript 6 系の JS API を使うため、7 には上げない
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     groups:
       # firebase と @firebase/rules-unit-testing は peer の関係にあるため、一緒に上げる
       firebase:
