@@ -37,8 +37,11 @@ export default defineConfig(({ mode }) => ({
     options: { typeAware: true, typeCheck: true },
   },
   // コミット時に、ステージしたファイルだけを整形・修正する（.vite-hooks/pre-commit）
+  // パターンごとに並行で走るため、同じファイルが2つのパターンに当たらないように分ける（配列の中は順に実行される）
   staged: {
-    "*": "vp check --fix",
+    "*.css": ["vp check --fix", "stylelint"],
+    "{*.tsx,index.html}": ["vp check --fix", "markuplint"],
+    "!(*.css|*.tsx|index.html)": "vp check --fix",
   },
   // vp check・lint・fmt のときはプラグインを読み込まない（設定の評価を軽くする）
   plugins: lazyPlugins(() => [
