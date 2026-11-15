@@ -73,6 +73,11 @@ export function monthEndKey(anchor: Date): DateKey {
   return toKey(endOfMonth(anchor));
 }
 
+/** 暦の1か月（1日〜末日）。monthRange は格子の42日分で、前後の月を含む。 */
+export function calendarMonthRange(anchor: Date): { start: DateKey; end: DateKey } {
+  return { start: toKey(startOfMonth(anchor)), end: monthEndKey(anchor) };
+}
+
 const WEEKDAY_JA = ["日", "月", "火", "水", "木", "金", "土"];
 
 export function weekdayJa(d: Date): string {

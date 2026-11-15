@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import {
+  calendarMonthRange,
   formatWeekRange,
   inferSlot,
   initialOccurredAt,
@@ -54,6 +55,15 @@ describe("食事枠の推定", () => {
   it("16:00〜23:59 は夕食", () => {
     expect(inferSlot(new Date(2026, 10, 10, 16, 0))).toBe("dinner");
     expect(inferSlot(new Date(2026, 10, 10, 23, 59))).toBe("dinner");
+  });
+});
+
+describe("暦の1か月", () => {
+  it("1日から末日まで", () => {
+    expect(calendarMonthRange(new Date(2026, 10, 11))).toEqual({ start: "2026-11-01", end: "2026-11-30" });
+  });
+  it("うるう年の2月", () => {
+    expect(calendarMonthRange(new Date(2028, 1, 29))).toEqual({ start: "2028-02-01", end: "2028-02-29" });
   });
 });
 
