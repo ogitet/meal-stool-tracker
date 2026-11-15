@@ -78,14 +78,13 @@ function DayDetailInner({ date }: { date: string }) {
           ) : (
             <>
               <h2 className="sh">食事</h2>
-              <div className="list" role="list">
+              <div className="list">
                 {FIXED_SLOTS.map((slot) => {
                   const m = meals.items.find((x) => x.slot === slot);
                   return (
                     <button
                       key={slot}
                       type="button"
-                      role="listitem"
                       className="dr"
                       onClick={() => nav.go(`/meal/${date}/${slot}`, "open")}
                     >
@@ -101,7 +100,6 @@ function DayDetailInner({ date }: { date: string }) {
                   <button
                     key={m.id}
                     type="button"
-                    role="listitem"
                     className="dr"
                     onClick={() => nav.go(`/meal/${date}/other/${m.id}`, "open")}
                   >
@@ -118,15 +116,9 @@ function DayDetailInner({ date }: { date: string }) {
               </div>
 
               <h2 className="sh">便</h2>
-              <div className="list" role="list">
+              <div className="list">
                 {stools.items.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    role="listitem"
-                    className="dr"
-                    onClick={() => nav.go(`/stool/${s.id}`, "open")}
-                  >
+                  <button key={s.id} type="button" className="dr" onClick={() => nav.go(`/stool/${s.id}`, "open")}>
                     <span className="tm">{formatTime(s.occurredAt)}</span>
                     <span className="vl stv">
                       <StoolMark shape={s.shape} size={20} />

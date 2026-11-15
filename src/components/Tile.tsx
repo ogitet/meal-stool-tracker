@@ -14,6 +14,7 @@ export function Tile({
 }) {
   return (
     <span
+      role="img"
       className={`t g-${category.group}${groupEnd ? " ge" : ""}`}
       style={{ "--i": index } as CSSProperties}
       title={`${GROUP_LABEL[category.group]}：${category.name}`}

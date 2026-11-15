@@ -75,7 +75,7 @@ test.describe("期間の移動と表示切替", () => {
     await page.getByRole("button", { name: "前の週" }).click();
     await expect.poll(() => anchorOf(page)).toBe("2026-11-04");
 
-    await page.getByRole("button", { name: "今日" }).click();
+    await page.getByRole("button", { name: "今日", exact: true }).click();
     await expect(page.locator(".slip.today")).toBeVisible();
   });
 

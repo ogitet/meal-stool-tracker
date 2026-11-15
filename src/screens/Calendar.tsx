@@ -129,7 +129,7 @@ export function Calendar() {
           今日
         </button>
         <button type="button" className="ico" aria-label="カテゴリ管理" onClick={() => nav.go("/categories", "push")}>
-          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24">
             <path
               d="M4 7h10M18 7h2M4 17h4M12 17h8"
               stroke="currentColor"
@@ -197,7 +197,7 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
   if (error) return <ErrorRetry message={error} onRetry={onRetry} />;
 
   return (
-    <div role="list" aria-busy={loading}>
+    <div aria-busy={loading}>
       {weekDays(anchor).map((d) => {
         const key = toKey(d);
         const future = isFuture(key);
@@ -213,7 +213,6 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
           <button
             key={key}
             type="button"
-            role="listitem"
             className={`slip${isToday ? " today" : ""}${future ? " future" : ""}`}
             disabled={future}
             aria-current={isToday ? "date" : undefined}
@@ -259,7 +258,7 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
           <span key={w}>{w}</span>
         ))}
       </div>
-      <div className="mgrid" role="list" aria-busy={stools.loading}>
+      <div className="mgrid" aria-busy={stools.loading}>
         {monthGrid(anchor).map((d) => {
           const key = toKey(d);
           const future = isFuture(key);
@@ -272,7 +271,6 @@ function MonthView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; o
             <button
               key={key}
               type="button"
-              role="listitem"
               className={cls}
               disabled={future}
               aria-current={key === today ? "date" : undefined}
