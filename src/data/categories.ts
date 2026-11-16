@@ -8,10 +8,10 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { db } from "@/firebase";
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
-import { sortCategories } from "@/lib/categories";
+import { nextOrder, sortCategories } from "@/lib/categories";
 import type { Category, GroupId } from "@/lib/types";
 import { getDocsOfflineAware } from "./read";
 import { queuedWrite } from "./write";
@@ -39,12 +39,20 @@ export interface CategoriesState {
   byId: Map<string, Category>;
   loading: boolean;
   error: string | null;
+  /** 読み込みに失敗したあと、購読し直す。 */
+  retry: () => void;
 }
 
 /** カテゴリは件数が少ないので常時購読する。空なら初期カテゴリを投入する。 */
 export function useCategories(uid: string): CategoriesState {
   const [all, setAll] = useState<Category[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 購読はエラーで終わるため、再試行では購読を作り直す
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => {
+    setError(null);
+    setAttempt((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     let seeding = false;
@@ -62,7 +70,7 @@ export function useCategories(uid: string): CategoriesState {
       () => setError("読み込めませんでした"),
     );
     return unsub;
-  }, [uid]);
+  }, [uid, attempt]);
 
   return useMemo(() => {
     const list = all ?? [];
@@ -72,8 +80,9 @@ export function useCategories(uid: string): CategoriesState {
       byId: new Map(list.map((c) => [c.id, c])),
       loading: all === null && error === null,
       error,
+      retry,
     };
-  }, [all, error]);
+  }, [all, error, retry]);
 }
 
 async function seedDefaults(uid: string): Promise<void> {
@@ -93,8 +102,7 @@ export async function addCategory(
   input: { name: string; abbr: string; group: GroupId },
   existing: Category[],
 ): Promise<void> {
-  const inGroup = existing.filter((c) => c.group === input.group);
-  const order = inGroup.reduce((m, c) => Math.max(m, c.order), -1) + 1;
+  const order = nextOrder(existing, input.group);
   const ref = doc(col(uid));
   queuedWrite(() => setDoc(ref, { ...input, active: true, order }));
 }

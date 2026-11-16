@@ -5,13 +5,14 @@ import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { DateTitle } from "@/components/DateTitle";
 import { Header } from "@/components/Header";
 import { Segment } from "@/components/Segment";
-import { Loading } from "@/components/Status";
+import { ErrorRetry, Loading } from "@/components/Status";
 import { StoolMark } from "@/components/StoolMark";
 import { useToast } from "@/components/Toast";
 import { createStool, deleteStool, getStool, updateStool } from "@/data/stools";
 import { useUserData } from "@/data/UserDataContext";
 import { writeErrorMessage } from "@/data/write";
 import { useNav } from "@/hooks/useNav";
+import { useToday } from "@/hooks/useToday";
 import { AMOUNT_LABEL, AMOUNTS, FEELING_LABEL, FEELINGS, SHAPE_LABEL, SHAPES } from "@/lib/constants";
 import { initialOccurredAt, isDateKey, isFuture, todayKey, toKey } from "@/lib/date";
 import type { Amount, Feeling, Shape } from "@/lib/types";
@@ -39,16 +40,24 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
 
   const [loaded, setLoaded] = useState(!editId);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [shape, setShape] = useState<Shape | null>(null);
   const [amount, setAmount] = useState<Amount | null>(null);
   const [feeling, setFeeling] = useState<Feeling | null>(null);
   const [dateStr, setDateStr] = useState(newDate ?? todayKey());
+  // 最後に入力された正しい日付。入力欄を空にしている間も、ヘッダーと戻り先にはこれを使う
+  const [validDate, setValidDate] = useState(newDate ?? todayKey());
   const [timeStr, setTimeStr] = useState(format(new Date(), "HH:mm"));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState(false);
 
-  const back = () => nav.back(`/day/${dateStr}`);
+  // 今日の記録として開いたか。開いたまま日付が変わっても、保存した時点の日付と時刻で記録する
+  const [forToday] = useState(() => newDate === todayKey());
+  const today = useToday();
+
+  const back = () => nav.back(`/day/${validDate}`);
 
   useEffect(() => {
     if (!editId) return;
@@ -64,19 +73,20 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
         setAmount(s.amount ?? null);
         setFeeling(s.feeling ?? null);
         setDateStr(toKey(s.occurredAt));
+        setValidDate(toKey(s.occurredAt));
         setTimeStr(format(s.occurredAt, "HH:mm"));
         setLoaded(true);
       })
-      .catch(() => alive && setError("読み込めませんでした"));
+      .catch(() => alive && setLoadError(true));
     return () => {
       alive = false;
     };
-  }, [uid, editId]);
+  }, [uid, editId, attempt]);
 
   if (notFound) return <Navigate to="/" replace />;
 
   function occurredAt(): Date | null {
-    if (!editId) return initialOccurredAt(newDate ?? todayKey());
+    if (!editId) return initialOccurredAt(forToday || !newDate ? todayKey() : newDate);
     const d = parse(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", new Date());
     return isValid(d) ? d : null;
   }
@@ -128,7 +138,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
             キャンセル
           </button>
         }
-        title={<DateTitle date={newDate ?? dateStr} />}
+        title={<DateTitle date={newDate ? (forToday ? today : newDate) : validDate} />}
         right={
           editId ? (
             <button type="button" className="lnk" onClick={() => setConfirm(true)}>
@@ -140,7 +150,17 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
       <div className="paper">
         <div className="main pad">
           {!loaded ? (
-            <Loading />
+            loadError ? (
+              <ErrorRetry
+                message="読み込めませんでした"
+                onRetry={() => {
+                  setLoadError(false);
+                  setAttempt((n) => n + 1);
+                }}
+              />
+            ) : (
+              <Loading />
+            )
           ) : (
             <>
               <div className="fl" id="lbl-shape">
@@ -190,7 +210,10 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
                       type="date"
                       value={dateStr}
                       max={todayKey()}
-                      onChange={(e) => setDateStr(e.target.value)}
+                      onChange={(e) => {
+                        setDateStr(e.target.value);
+                        if (isDateKey(e.target.value)) setValidDate(e.target.value);
+                      }}
                       aria-label="日付"
                     />
                     <input

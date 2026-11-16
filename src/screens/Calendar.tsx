@@ -9,6 +9,7 @@ import { useStoolsInRange } from "@/data/stools";
 import { useUserData } from "@/data/UserDataContext";
 import { useNav } from "@/hooks/useNav";
 import { useSwipe, type SwipeDir } from "@/hooks/useSwipe";
+import { useToday } from "@/hooks/useToday";
 import { dayTiles } from "@/lib/categories";
 import {
   formatMonthJa,
@@ -66,7 +67,8 @@ export function Calendar() {
     setParams(p, { replace: true });
   }
 
-  const today = todayKey();
+  // 表示用の今日。記録や「今日」への移動は、押した時点の日付で決める（開いたまま日付が変わることがあるため）
+  const today = useToday();
   function go(n: SwipeDir) {
     const cur = current();
     const from = fromKey(cur.d);
@@ -75,8 +77,9 @@ export function Calendar() {
   }
   function goToday() {
     const cur = current();
-    setDir(today === cur.d ? 0 : today > cur.d ? 1 : -1);
-    update({ d: today });
+    const now = todayKey();
+    setDir(now === cur.d ? 0 : now > cur.d ? 1 : -1);
+    update({ d: now });
   }
   const swipe = useSwipe(go);
 
@@ -162,10 +165,10 @@ export function Calendar() {
       </div>
 
       <nav className="bar cal" aria-label="記録">
-        <button type="button" className="btn rec" onClick={() => nav.go(`/meal/${today}/${inferSlot()}`, "open")}>
+        <button type="button" className="btn rec" onClick={() => nav.go(`/meal/${todayKey()}/${inferSlot()}`, "open")}>
           食事
         </button>
-        <button type="button" className="btn rec" onClick={() => nav.go(`/stool/new?date=${today}`, "open")}>
+        <button type="button" className="btn rec" onClick={() => nav.go(`/stool/new?date=${todayKey()}`, "open")}>
           便
         </button>
       </nav>
@@ -194,7 +197,17 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
   const error = meals.error ?? stools.error ?? categories.error;
   const loading = meals.loading || stools.loading || categories.loading;
 
-  if (error) return <ErrorRetry message={error} onRetry={onRetry} />;
+  if (error) {
+    return (
+      <ErrorRetry
+        message={error}
+        onRetry={() => {
+          if (categories.error) categories.retry();
+          onRetry();
+        }}
+      />
+    );
+  }
 
   return (
     <div aria-busy={loading}>

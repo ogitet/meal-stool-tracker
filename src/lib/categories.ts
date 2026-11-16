@@ -1,11 +1,16 @@
 import { GROUP_INDEX } from "./constants";
-import type { Category } from "./types";
+import type { Category, GroupId } from "./types";
 
 /** グループ順 → グループ内の order 順に並べる。 */
 export function sortCategories(list: Category[]): Category[] {
   return [...list].sort(
     (a, b) => GROUP_INDEX[a.group] - GROUP_INDEX[b.group] || a.order - b.order || a.name.localeCompare(b.name, "ja"),
   );
+}
+
+/** グループの末尾に置くための order（そのグループで最も大きい値の次）。 */
+export function nextOrder(existing: Category[], group: GroupId): number {
+  return existing.filter((c) => c.group === group).reduce((m, c) => Math.max(m, c.order), -1) + 1;
 }
 
 /**

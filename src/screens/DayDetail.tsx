@@ -17,14 +17,15 @@ import type { Category, Meal, Stool } from "@/lib/types";
 /** S-03 日別詳細。並びは Structure 3章（朝・昼・夕・その他・便）。 */
 export function DayDetail() {
   const { date } = useParams();
+  // 再試行では中身を作り直し、エラーで終わった購読をやり直す
+  const [retry, setRetry] = useState(0);
   if (!isDateKey(date) || isFuture(date)) return <Navigate to="/" replace />;
-  return <DayDetailInner date={date} />;
+  return <DayDetailInner key={retry} date={date} onRetry={() => setRetry((n) => n + 1)} />;
 }
 
-function DayDetailInner({ date }: { date: string }) {
+function DayDetailInner({ date, onRetry }: { date: string; onRetry: () => void }) {
   const { uid, categories } = useUserData();
   const nav = useNav();
-  const [retry, setRetry] = useState(0);
   const meals = useMealsInRange(uid, date, date);
   const stools = useStoolsInRange(uid, date, date);
 
@@ -73,9 +74,15 @@ function DayDetailInner({ date }: { date: string }) {
         title={<DateTitle date={date} />}
       />
       <div className="paper">
-        <div className="main end" key={retry}>
+        <div className="main end">
           {error ? (
-            <ErrorRetry message={error} onRetry={() => setRetry((n) => n + 1)} />
+            <ErrorRetry
+              message={error}
+              onRetry={() => {
+                if (categories.error) categories.retry();
+                onRetry();
+              }}
+            />
           ) : (
             <>
               <h2 className="sh">食事</h2>

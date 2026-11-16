@@ -4,7 +4,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
-import { deleteDoc, doc, getDoc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
+import { deleteDoc, deleteField, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vite-plus/test";
 
@@ -97,6 +97,8 @@ describe("categories の値", () => {
     ["名称が11文字", { name: "あ".repeat(11) }],
     ["名称が文字列でない", { name: 1 }],
     ["略称が空", { abbr: "" }],
+    ["略称が3文字", { abbr: "ごはん" }],
+    ["決めていないフィールド", { memo: "x" }],
     ["決めていないグループ", { group: "drink" }],
     ["active が真偽値でない", { active: "yes" }],
     ["order が数値でない", { order: "0" }],
@@ -124,8 +126,19 @@ describe("meals の値", () => {
     ["決めていない時間帯", { slot: "snack" }],
     ["カテゴリが空", { categoryIds: [] }],
     ["カテゴリが配列でない", { categoryIds: "c1" }],
+    ["カテゴリが101件", { categoryIds: Array.from({ length: 101 }, (_, i) => `c${i}`) }],
+    ["カテゴリの先頭が文字列でない", { categoryIds: [1] }],
+    ["作成日時が timestamp でない", { createdAt: "2026-11-13" }],
+    ["決めていないフィールド", { memo: "x" }],
   ])("%s は保存できない", async (_label, patch) => {
     await assertFails(setDoc(doc(mine(), path), { ...meal, ...patch }));
+  });
+
+  it("画面と同じ形（サーバーの日時つき）で作成・更新できる", async () => {
+    await assertSucceeds(
+      setDoc(doc(mine(), path), { ...meal, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }),
+    );
+    await assertSucceeds(updateDoc(doc(mine(), path), { categoryIds: ["c2"], updatedAt: serverTimestamp() }));
   });
 
   it("更新で不正な値にはできない", async () => {
@@ -150,8 +163,30 @@ describe("stools の値", () => {
     ["決めていない形", { shape: "unknown" }],
     ["決めていない量", { amount: "huge" }],
     ["決めていない感覚", { feeling: "good" }],
+    ["更新日時が timestamp でない", { updatedAt: "2026-11-13" }],
+    ["決めていないフィールド", { memo: "x" }],
   ])("%s は保存できない", async (_label, patch) => {
     await assertFails(setDoc(doc(mine(), path), { ...stool, ...patch }));
+  });
+
+  it("画面と同じ形（サーバーの日時つき）で作成でき、量と感覚を消す更新もできる", async () => {
+    await assertSucceeds(
+      setDoc(doc(mine(), path), {
+        ...stool,
+        amount: "large",
+        feeling: "clear",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }),
+    );
+    await assertSucceeds(
+      updateDoc(doc(mine(), path), {
+        ...stool,
+        amount: deleteField(),
+        feeling: deleteField(),
+        updatedAt: serverTimestamp(),
+      }),
+    );
   });
 
   it("量と感覚は、あってもなくても保存できる", async () => {

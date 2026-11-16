@@ -24,7 +24,7 @@ export function CategoryList() {
       <div className="paper">
         <div className="main">
           {categories.error ? (
-            <ErrorRetry message={categories.error} />
+            <ErrorRetry message={categories.error} onRetry={categories.retry} />
           ) : categories.loading ? (
             <Loading />
           ) : (

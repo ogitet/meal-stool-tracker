@@ -7,7 +7,7 @@ import { addCategory, isDuplicateName, updateCategory } from "@/data/categories"
 import { useUserData } from "@/data/UserDataContext";
 import { writeErrorMessage } from "@/data/write";
 import { useNav } from "@/hooks/useNav";
-import { abbrIsOneChar, defaultAbbr } from "@/lib/categories";
+import { abbrIsOneChar, defaultAbbr, nextOrder } from "@/lib/categories";
 import { CATEGORY_NAME_MAX, GROUPS } from "@/lib/constants";
 import type { GroupId } from "@/lib/types";
 
@@ -63,7 +63,11 @@ export function CategoryEdit() {
     setError(null);
     try {
       if (isNew) await addCategory(uid, { name: trimmed, abbr, group }, categories.all);
-      else if (target) await updateCategory(uid, target.id, { name: trimmed, abbr, group, active });
+      else if (target) {
+        // グループを移したら、移った先の末尾に置く（元の order のままだと、移った先で順番が重なる）
+        const moved = group === target.group ? {} : { order: nextOrder(categories.all, group) };
+        await updateCategory(uid, target.id, { name: trimmed, abbr, group, active, ...moved });
+      }
       toast(isNew ? "追加しました" : "保存しました");
       back();
     } catch (e) {

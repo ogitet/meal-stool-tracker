@@ -31,6 +31,16 @@ test("同じグループに同じ名称は保存できない", async ({ page }) 
   await expect(saveButton(page)).toBeEnabled();
 });
 
+test("グループを移すと、移った先の末尾に並ぶ", async ({ page }) => {
+  await page.goto("/categories");
+  await page.locator(".cr", { hasText: "米" }).click();
+  await page.locator("#cat-group").selectOption("other");
+  await saveButton(page).click();
+  await expectPath(page, "/categories");
+  const other = page.locator("section", { has: page.locator("h2", { hasText: /^その他$/ }) });
+  await expect(other.locator(".cr").last()).toContainText("米");
+});
+
 test("「使わない」にすると、新規の選択肢から消える", async ({ page }) => {
   await page.goto("/categories");
   await page.locator(".cr", { hasText: "コーヒー" }).click();

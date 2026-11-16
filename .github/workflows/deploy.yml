@@ -31,8 +31,11 @@ jobs:
       # E2E とルールのテストは PR の CI で実行する。ここでは整形・lint・型と単体テストを最後の確認として残す
       - run: vp check
       - run: vp test run
+      # 秘密の値はシェルの文に埋め込まず、環境変数で渡す（値に引用符があっても壊れず、文として解釈されない）
       - name: Write service account key
-        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > "$RUNNER_TEMP/sa.json"
+        run: printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - name: Build & deploy
         run: npm run deploy -- --non-interactive
         env:
