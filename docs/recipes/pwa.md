@@ -7,6 +7,7 @@
    - キャッシュするのは画面のファイルだけにする（`globPatterns`）。API やデータベースへの通信はキャッシュしない。
    - `navigateFallback` は `/index.html`。
 3. `src/main.tsx` で `registerSW({ immediate: true })` を呼ぶ（`virtual:pwa-register`）。
+   - `autoUpdate` は、新しい版が有効になるとページを読み直す。入力の途中で読み直されると内容が消えるため、`onNeedReload` で受け取り、入力画面を離れてから読み直す（`src/pwa.ts`）。
 4. `index.html` に `apple-mobile-web-app-capable`、`apple-mobile-web-app-title`、`theme-color`、`apple-touch-icon` を足す。
 5. アイコン（192、512、apple-touch-icon）を `public/icons/` に置く。
 6. `.storybook/main.ts` の `viteFinal` で、名前が `vite-plugin-pwa` で始まるプラグインを除く（Storybook では Service Worker を作らない）。
