@@ -108,6 +108,22 @@ test("削除の確認で「やめる」を選ぶと、記録は残る", async ({
   await expect(page.locator('.chip[aria-pressed="true"]')).toHaveCount(4);
 });
 
+test("削除の確認はキーボードで操作でき、Esc でやめられる", async ({ page }) => {
+  const yesterday = dateKey(-1);
+  await page.goto(`/meal/${yesterday}/dinner`);
+  await page.locator(".hd .lnk", { hasText: "削除" }).click();
+  const cancel = page.locator(".sheet .btn.plain");
+  const confirm = page.locator(".sheet .btn.del");
+  await expect(cancel).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(confirm).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(cancel).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".sheet")).toHaveCount(0);
+  await expect(page.locator('.chip[aria-pressed="true"]')).toHaveCount(4);
+});
+
 test("便の編集では日時を修正できる", async ({ page }) => {
   await page.goto(`/day/${today}`);
   await page
