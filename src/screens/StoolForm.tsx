@@ -151,7 +151,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
                   const on = shape === s;
                   return (
                     <button key={s} type="button" className="chip shape" aria-pressed={on} onClick={() => setShape(s)}>
-                      <StoolMark shape={s} size={26} color={on ? "#ffffff" : undefined} />
+                      <StoolMark shape={s} size={26} />
                       {SHAPE_LABEL[s]}
                     </button>
                   );

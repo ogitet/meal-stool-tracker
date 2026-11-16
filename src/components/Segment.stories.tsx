@@ -15,7 +15,7 @@ export const Slot: Story = {
   render: () => {
     const [v, setV] = useState<string | null>("lunch");
     return (
-      <div style={{ background: "#fff", padding: 12, borderRadius: 14 }}>
+      <div style={{ background: "var(--paper)", padding: 12, borderRadius: 14 }}>
         <Segment
           className="slot"
           label="食事枠"
@@ -33,7 +33,7 @@ export const Optional: Story = {
   render: () => {
     const [v, setV] = useState<string | null>(null);
     return (
-      <div style={{ background: "#fff", padding: 12, borderRadius: 14 }}>
+      <div style={{ background: "var(--paper)", padding: 12, borderRadius: 14 }}>
         <Segment
           optional
           label="量"

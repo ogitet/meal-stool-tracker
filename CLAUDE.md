@@ -42,6 +42,7 @@ stylelint は `src/**/*.css` が対象。ルールは `stylelint-config-standard
 - **書き込み**: オフライン記録は MVP の対象外。書き込みは必ず `src/data/write.ts` の `guardedWrite`（オフライン検知＋8秒のタイムアウト）を通し、`writeErrorMessage` でトースト用の文言にする。
 - **画面とルーティング**: `src/App.tsx` が `createBrowserRouter`（View Transitions に必要）で `src/screens/*` を配置。未ログインは `Login` のみ。純粋なロジック（日付・カテゴリ）は `src/lib/` にあり、単体テストはここに置く。
 - **import のパス**: `src/` 内でフォルダーをまたぐ import は `@/`（= `src/`）で書く。同じフォルダー内は `./`。`src/` で `../` を書くと lint がエラーにする。対応は `vite.config.ts` の `resolve.alias` と `tsconfig.app.json` の `paths` の2か所に書いている。設定ファイル（`vite.config.ts`、`.storybook/main.ts`）は Vite を通さずに読み込まれるため、相対パスのままにする。
+- **配色**: 明るい配色と暗い配色を、端末の設定（`prefers-color-scheme`）で切り替える。色は `src/styles/global.css` の `:root` に `light-dark(明, 暗)` で書き、CSS や TSX に色を直接書かない（ビルドが古いブラウザー向けに変換する）。色を変えたら `src/styles/palette.test.ts`（コントラスト比）と `docs/05-surface.md` 2章の表も直す。`index.html` の `theme-color` と `e2e/theme.spec.ts` にも地の色を書いている。Storybook はツールバーの「配色」で切り替える（`:root[data-theme]`）。
 - **アカウント**: アプリに登録画面はない。ユーザーは Firebase コンソールで追加する。
 - **PWA**: `vite.config.ts` で vite-plugin-pwa を設定。アイコンの中身から版番号（`ICON_VERSION`）を作って URL に付け、iOS のキャッシュを回避する。Firestore の通信は SW でキャッシュしない。アイコンの再生成は `npm run icons`（`public/favicon.svg` と共有用の `public/og-image.png` も作る。og-image の文字は Playwright の Chromium と Google Fonts で描くため、ブラウザーの導入と通信が必要）。`index.html` の OGP と canonical には公開先の URL を直接書いている。
 - **Storybook**: ストーリーは対象の隣（`*.stories.tsx`、画面は `src/screens/screens.stories.tsx`）。設定は `.storybook/`。
