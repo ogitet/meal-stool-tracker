@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { db } from "@/firebase";
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
-import { sortCategories } from "@/lib/categories";
+import { nextOrder, sortCategories } from "@/lib/categories";
 import type { Category, GroupId } from "@/lib/types";
 import { getDocsOfflineAware } from "./read";
 import { queuedWrite } from "./write";
@@ -102,8 +102,7 @@ export async function addCategory(
   input: { name: string; abbr: string; group: GroupId },
   existing: Category[],
 ): Promise<void> {
-  const inGroup = existing.filter((c) => c.group === input.group);
-  const order = inGroup.reduce((m, c) => Math.max(m, c.order), -1) + 1;
+  const order = nextOrder(existing, input.group);
   const ref = doc(col(uid));
   queuedWrite(() => setDoc(ref, { ...input, active: true, order }));
 }

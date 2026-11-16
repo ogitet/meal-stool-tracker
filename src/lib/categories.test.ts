@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { abbrIsOneChar, dayTiles, defaultAbbr, sortCategories } from "./categories";
+import { abbrIsOneChar, dayTiles, defaultAbbr, nextOrder, sortCategories } from "./categories";
 import { DEFAULT_CATEGORIES } from "./constants";
 import type { Category } from "./types";
 
@@ -11,6 +11,16 @@ describe("カテゴリの並び", () => {
     const shuffled = [...all].reverse();
     const sorted = sortCategories(shuffled);
     expect(sorted.map((c) => c.id)).toEqual(all.map((c) => c.id));
+  });
+});
+
+describe("グループの末尾の order", () => {
+  it("そのグループで最も大きい order の次", () => {
+    expect(nextOrder(all, "staple")).toBe(3);
+    expect(nextOrder(all, "sweets")).toBe(8);
+  });
+  it("空のグループでは 0", () => {
+    expect(nextOrder([], "other")).toBe(0);
   });
 });
 

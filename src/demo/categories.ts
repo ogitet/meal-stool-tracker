@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { sortCategories } from "@/lib/categories";
+import { nextOrder, sortCategories } from "@/lib/categories";
 import type { Category, GroupId } from "@/lib/types";
 import { accept, newId, store, useStoreVersion } from "./store";
 
@@ -35,7 +35,7 @@ export async function addCategory(
   input: { name: string; abbr: string; group: GroupId },
   existing: Category[],
 ): Promise<void> {
-  const order = existing.filter((c) => c.group === input.group).reduce((m, c) => Math.max(m, c.order), -1) + 1;
+  const order = nextOrder(existing, input.group);
   const id = newId("c");
   store.categories = [...store.categories, { id, ...input, active: true, order }];
   accept(id);
