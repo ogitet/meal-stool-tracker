@@ -21,7 +21,14 @@ export const AllShapes: Story = {
       {SHAPES.map((s) => (
         <div
           key={s}
-          style={{ display: "grid", justifyItems: "center", gap: 6, background: "#fff", padding: 12, borderRadius: 12 }}
+          style={{
+            display: "grid",
+            justifyItems: "center",
+            gap: 6,
+            background: "var(--paper)",
+            padding: 12,
+            borderRadius: 12,
+          }}
         >
           <StoolMark shape={s} size={26} />
           <StoolMark shape={s} size={18} />

@@ -24,7 +24,7 @@ export const AllCategories: Story = {
     <div
       style={{
         width: 300,
-        background: "#fff",
+        background: "var(--paper)",
         padding: 12,
         borderRadius: 14,
         display: "flex",
@@ -43,7 +43,7 @@ export const OneDay: Story = {
     <div
       style={{
         width: 240,
-        background: "#fff",
+        background: "var(--paper)",
         padding: 12,
         borderRadius: 14,
         display: "flex",

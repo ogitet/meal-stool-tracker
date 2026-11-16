@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 // ↑ vp check の型チェックは .storybook に tsconfig の types を当てないため、CSS の読み込みの型をここで参照する
 import type { Decorator, Preview } from "@storybook/react-vite";
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router-dom";
 import { ToastProvider } from "../src/components/Toast";
 import { UserDataProvider } from "../src/data/UserDataContext";
@@ -27,6 +27,20 @@ const StoryElement = createContext<ReactNode>(null);
 function StorySlot() {
   return useContext(StoryElement);
 }
+
+/**
+ * ツールバーの「配色」で、明るい配色と暗い配色を切り替える。
+ * 「端末の設定」ではアプリと同じく prefers-color-scheme に従う（global.css の :root[data-theme]）。
+ */
+const withTheme: Decorator = (Story, { globals }) => {
+  const theme = globals.theme as "system" | "light" | "dark";
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "system") delete root.dataset.theme;
+    else root.dataset.theme = theme;
+  }, [theme]);
+  return <Story />;
+};
 
 /** アプリと同じ前提（例データ、トースト、ルーター）で描画する。 */
 const withApp: Decorator = (Story, { parameters }) => {
@@ -54,7 +68,7 @@ const withApp: Decorator = (Story, { parameters }) => {
 };
 
 const preview: Preview = {
-  decorators: [withApp],
+  decorators: [withApp, withTheme],
   parameters: {
     layout: "fullscreen",
     viewport: {
@@ -64,8 +78,24 @@ const preview: Preview = {
     },
     a11y: { test: "todo" },
   },
+  globalTypes: {
+    theme: {
+      description: "配色",
+      toolbar: {
+        title: "配色",
+        icon: "contrast",
+        items: [
+          { value: "system", title: "端末の設定" },
+          { value: "light", title: "明るい配色" },
+          { value: "dark", title: "暗い配色" },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
   initialGlobals: {
     viewport: { value: "iphoneSE", isRotated: false },
+    theme: "system",
   },
 };
 
