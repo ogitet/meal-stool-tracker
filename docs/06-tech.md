@@ -147,6 +147,7 @@ flowchart LR
 | 新規登録 | 本人のアカウントは Firebase の管理画面で作成する。アプリには登録画面を設けない。加えて、Authentication の設定で「作成（登録）」を無効にし、SDK 経由の登録も止める |
 | ログインの維持 | SDK の既定の保存方式で、ログイン状態を端末に保持する |
 | 通信 | Firebase Hosting と SDK はすべて HTTPS |
+| 応答ヘッダー | Hosting の設定（`firebase.json`）で、他のサイトへの埋め込みの禁止（`X-Frame-Options`、CSP の `frame-ancestors`）、`nosniff`、`Referrer-Policy`、`Permissions-Policy` を付ける。CSP で読み込み元と通信先まで絞ること（`script-src`、`connect-src`）は、Firebase の通信先を本番で確かめる必要があるため、まだ行っていない |
 
 ホーム画面に追加した Web アプリでも、長期間の未使用や端末の容量不足でログイン状態が消えることがある。その場合は再ログインで復帰でき、データは失われない。
 
