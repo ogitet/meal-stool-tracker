@@ -121,6 +121,18 @@ test("便の編集では日時を修正できる", async ({ page }) => {
   await expect(page.locator(".dr .tm").first()).toHaveText("06:45");
 });
 
+test("便の編集で日付を空にしても、ヘッダーの日付は崩れず、保存はできない", async ({ page }) => {
+  await page.goto(`/day/${today}`);
+  await page
+    .locator(".dr", { has: page.locator(".tm") })
+    .first()
+    .click();
+  await page.locator("#stool-date").fill("");
+  await expect(page.locator(".hd .dtt .sr")).toHaveText("11月11日 水曜日");
+  await saveButton(page).click();
+  await expect(page.locator(".msg")).toHaveText("日時の形式が正しくありません");
+});
+
 test("未来の日は開けない", async ({ page }) => {
   await page.goto(`/day/${dateKey(1)}`);
   await expectPath(page, "/");

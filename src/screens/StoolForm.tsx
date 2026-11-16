@@ -46,6 +46,8 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   const [amount, setAmount] = useState<Amount | null>(null);
   const [feeling, setFeeling] = useState<Feeling | null>(null);
   const [dateStr, setDateStr] = useState(newDate ?? todayKey());
+  // 最後に入力された正しい日付。入力欄を空にしている間も、ヘッダーと戻り先にはこれを使う
+  const [validDate, setValidDate] = useState(newDate ?? todayKey());
   const [timeStr, setTimeStr] = useState(format(new Date(), "HH:mm"));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +57,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   const [forToday] = useState(() => newDate === todayKey());
   const today = useToday();
 
-  const back = () => nav.back(`/day/${dateStr}`);
+  const back = () => nav.back(`/day/${validDate}`);
 
   useEffect(() => {
     if (!editId) return;
@@ -71,6 +73,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
         setAmount(s.amount ?? null);
         setFeeling(s.feeling ?? null);
         setDateStr(toKey(s.occurredAt));
+        setValidDate(toKey(s.occurredAt));
         setTimeStr(format(s.occurredAt, "HH:mm"));
         setLoaded(true);
       })
@@ -135,7 +138,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
             キャンセル
           </button>
         }
-        title={<DateTitle date={newDate ? (forToday ? today : newDate) : dateStr} />}
+        title={<DateTitle date={newDate ? (forToday ? today : newDate) : validDate} />}
         right={
           editId ? (
             <button type="button" className="lnk" onClick={() => setConfirm(true)}>
@@ -207,7 +210,10 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
                       type="date"
                       value={dateStr}
                       max={todayKey()}
-                      onChange={(e) => setDateStr(e.target.value)}
+                      onChange={(e) => {
+                        setDateStr(e.target.value);
+                        if (isDateKey(e.target.value)) setValidDate(e.target.value);
+                      }}
                       aria-label="日付"
                     />
                     <input
