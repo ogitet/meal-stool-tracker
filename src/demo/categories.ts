@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { sortCategories } from "@/lib/categories";
 import type { Category, GroupId } from "@/lib/types";
-import { emit, newId, store, useStoreVersion } from "./store";
+import { accept, newId, store, useStoreVersion } from "./store";
 
 export interface CategoriesState {
   all: Category[];
@@ -32,8 +32,9 @@ export async function addCategory(
   existing: Category[],
 ): Promise<void> {
   const order = existing.filter((c) => c.group === input.group).reduce((m, c) => Math.max(m, c.order), -1) + 1;
-  store.categories = [...store.categories, { id: newId("c"), ...input, active: true, order }];
-  emit();
+  const id = newId("c");
+  store.categories = [...store.categories, { id, ...input, active: true, order }];
+  accept(id);
 }
 
 export async function updateCategory(
@@ -42,7 +43,7 @@ export async function updateCategory(
   patch: Partial<Pick<Category, "name" | "abbr" | "group" | "active" | "order">>,
 ): Promise<void> {
   store.categories = store.categories.map((c) => (c.id === id ? { ...c, ...patch } : c));
-  emit();
+  accept(id);
 }
 
 export function isDuplicateName(name: string, group: GroupId, existing: Category[], selfId?: string): boolean {

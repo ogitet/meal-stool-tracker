@@ -23,6 +23,8 @@ export interface Meal {
   categoryIds: string[];
   createdAt: Date | null;
   updatedAt: Date | null;
+  /** 端末に保存済みで、まだサーバーに届いていない（未同期） */
+  pending?: boolean;
 }
 
 export interface Stool {
@@ -32,4 +34,6 @@ export interface Stool {
   shape: Shape;
   amount?: Amount;
   feeling?: Feeling;
+  /** 端末に保存済みで、まだサーバーに届いていない（未同期） */
+  pending?: boolean;
 }

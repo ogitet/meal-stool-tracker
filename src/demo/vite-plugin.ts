@@ -12,7 +12,7 @@ export function demoData(): Plugin {
       if (!importer || importer.includes("/src/demo/")) return null;
       const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
       if (!resolved) return null;
-      if (/\/src\/data\/(useAuth|categories|meals|stools)\.ts$/.test(resolved.id)) {
+      if (/\/src\/data\/(useAuth|categories|meals|stools|sync)\.ts$/.test(resolved.id)) {
         return resolved.id.replace("/src/data/", "/src/demo/");
       }
       return resolved;

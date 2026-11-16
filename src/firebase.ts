@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 const required = [
   "VITE_FIREBASE_API_KEY",
@@ -25,4 +25,11 @@ export const app = initializeApp({
 });
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+/**
+ * 記録を端末（IndexedDB）にも保存し、オフラインでも読み書きできるようにする（Scope Q14、06-tech 6章）。
+ * オフラインでの書き込みは端末に残り、通信が戻ると Firestore が自動で送る。
+ * 端末に保存できないブラウザー（プライベートブラウズなど）では、メモリ内の保存に切り替わる。
+ */
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+});

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { DateKey, Meal, Slot } from "@/lib/types";
-import { emit, newId, store, useStoreVersion } from "./store";
+import { accept, newId, pendingIds, store, useStoreVersion } from "./store";
 
 export interface RangeState<T> {
   items: T[];
@@ -15,7 +15,13 @@ export function fixedMealId(date: DateKey, slot: Exclude<Slot, "other">): string
 export function useMealsInRange(_uid: string, start: DateKey, end: DateKey): RangeState<Meal> {
   const v = useStoreVersion();
   return useMemo(
-    () => ({ items: store.meals.filter((m) => m.date >= start && m.date <= end), loading: false, error: null }),
+    () => ({
+      items: store.meals
+        .filter((m) => m.date >= start && m.date <= end)
+        .map((m) => (pendingIds.has(m.id) ? { ...m, pending: true } : m)),
+      loading: false,
+      error: null,
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [v, start, end],
   );
@@ -32,18 +38,18 @@ export async function createMeal(_uid: string, date: DateKey, slot: Slot, catego
     ...store.meals.filter((m) => m.id !== id),
     { id, date, slot, categoryIds, createdAt: now, updatedAt: now },
   ];
-  emit();
+  accept(id);
   return id;
 }
 
 export async function updateMealCategories(_uid: string, id: string, categoryIds: string[]): Promise<void> {
   store.meals = store.meals.map((m) => (m.id === id ? { ...m, categoryIds, updatedAt: new Date() } : m));
-  emit();
+  accept(id);
 }
 
 export async function deleteMeal(_uid: string, id: string): Promise<void> {
   store.meals = store.meals.filter((m) => m.id !== id);
-  emit();
+  accept(id);
 }
 
 export async function findPreviousMeal(

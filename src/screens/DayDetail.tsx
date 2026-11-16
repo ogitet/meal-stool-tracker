@@ -49,6 +49,7 @@ function DayDetailInner({ date }: { date: string }) {
           <TileRow categories={list} />
         </span>
         <span className="vn">{list.map(displayName).join("、")}</span>
+        {m.pending && <span className="uns">未同期</span>}
       </span>
     );
   }
@@ -123,6 +124,7 @@ function DayDetailInner({ date }: { date: string }) {
                     <span className="vl stv">
                       <StoolMark shape={s.shape} size={20} />
                       {stoolText(s)}
+                      {s.pending && <span className="uns">未同期</span>}
                     </span>
                     <span className="chev" aria-hidden="true">
                       ›

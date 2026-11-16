@@ -1,13 +1,12 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   deleteField,
   doc,
-  getDoc,
   onSnapshot,
   query,
   serverTimestamp,
+  setDoc,
   Timestamp,
   updateDoc,
   where,
@@ -19,7 +18,8 @@ import { db } from "@/firebase";
 import { toKey } from "@/lib/date";
 import type { Amount, DateKey, Feeling, Shape, Stool } from "@/lib/types";
 import type { RangeState } from "./meals";
-import { guardedWrite } from "./write";
+import { getDocCacheFirst } from "./read";
+import { queuedWrite } from "./write";
 
 function col(uid: string) {
   return collection(db, "users", uid, "stools");
@@ -36,6 +36,7 @@ function fromDoc(d: DocumentSnapshot<DocumentData>): Stool | null {
   };
   if (v.amount) s.amount = v.amount as Amount;
   if (v.feeling) s.feeling = v.feeling as Feeling;
+  if (d.metadata.hasPendingWrites) s.pending = true;
   return s;
 }
 
@@ -46,6 +47,7 @@ export function useStoolsInRange(uid: string, start: DateKey, end: DateKey): Ran
     const q = query(col(uid), where("date", ">=", start), where("date", "<=", end));
     return onSnapshot(
       q,
+      { includeMetadataChanges: true },
       (snap) => {
         const items = snap.docs
           .map(fromDoc)
@@ -60,8 +62,8 @@ export function useStoolsInRange(uid: string, start: DateKey, end: DateKey): Ran
 }
 
 export async function getStool(uid: string, id: string): Promise<Stool | null> {
-  const snap = await getDoc(doc(col(uid), id));
-  return fromDoc(snap);
+  const snap = await getDocCacheFirst(doc(col(uid), id));
+  return snap ? fromDoc(snap) : null;
 }
 
 export interface StoolInput {
@@ -81,12 +83,13 @@ export async function createStool(uid: string, input: StoolInput): Promise<strin
   };
   if (input.amount) data.amount = input.amount;
   if (input.feeling) data.feeling = input.feeling;
-  const ref = await guardedWrite(() => addDoc(col(uid), data));
+  const ref = doc(col(uid));
+  queuedWrite(() => setDoc(ref, data));
   return ref.id;
 }
 
 export async function updateStool(uid: string, id: string, input: StoolInput): Promise<void> {
-  await guardedWrite(() =>
+  queuedWrite(() =>
     updateDoc(doc(col(uid), id), {
       date: toKey(input.occurredAt),
       occurredAt: Timestamp.fromDate(input.occurredAt),
@@ -99,5 +102,5 @@ export async function updateStool(uid: string, id: string, input: StoolInput): P
 }
 
 export async function deleteStool(uid: string, id: string): Promise<void> {
-  await guardedWrite(() => deleteDoc(doc(col(uid), id)));
+  queuedWrite(() => deleteDoc(doc(col(uid), id)));
 }

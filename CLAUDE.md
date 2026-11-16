@@ -37,9 +37,9 @@ stylelint は `src/**/*.css` が対象。ルールは `stylelint-config-standard
 
 ## アーキテクチャ
 
-- **データ層の差し替え（デモモード）**: 画面は `src/data/{useAuth,categories,meals,stools}.ts`（Firestore 実装）だけに依存する。`mode === "demo"` のとき `src/demo/vite-plugin.ts` が、これらの import を同名の `src/demo/*`（メモリ内実装）に解決し直す。Storybook と E2E もこの仕組みで Firebase なしに動く。したがって **`src/data/` の公開 API を変えたら `src/demo/` の対応ファイルも同じ形に直す**。`src/demo/` 内からの import は差し替え対象外。
+- **データ層の差し替え（デモモード）**: 画面は `src/data/{useAuth,categories,meals,stools,sync}.ts`（Firestore 実装）だけに依存する。`mode === "demo"` のとき `src/demo/vite-plugin.ts` が、これらの import を同名の `src/demo/*`（メモリ内実装）に解決し直す。Storybook と E2E もこの仕組みで Firebase なしに動く。したがって **`src/data/` の公開 API を変えたら `src/demo/` の対応ファイルも同じ形に直す**。`src/demo/` 内からの import は差し替え対象外。
 - **Firestore のモデル**: `users/{uid}/{categories,meals,stools}`。アクセス制限は `firestore.rules`、インデックスは `firestore.indexes.json`。ログイン後に `UserDataProvider`（`src/data/UserDataContext.tsx`）がカテゴリを1回だけ購読し、全画面で共有する。
-- **書き込み**: オフライン記録は MVP の対象外。書き込みは必ず `src/data/write.ts` の `guardedWrite`（オフライン検知＋8秒のタイムアウト）を通し、`writeErrorMessage` でトースト用の文言にする。
+- **書き込みとオフライン**: Firestore のオフライン保存（`src/firebase.ts`）で、オフラインでも記録できる（Scope Q14、06-tech 6章）。書き込みは必ず `src/data/write.ts` の `queuedWrite` を通す。サーバーに届くのを待たずに戻り、未同期の有無と後から分かった失敗は `SyncNotice`（`src/components/`）が示す。そのため書き込みの Promise を `await` しない。1件の読み込みは `src/data/read.ts`（端末の保存分を先に見る）を使う。デモのデータ層（`src/demo/store.ts` の `accept`）も、オフラインの間の書き込みを未同期として扱う。
 - **画面とルーティング**: `src/App.tsx` が `createBrowserRouter`（View Transitions に必要）で `src/screens/*` を配置。未ログインは `Login` のみ。純粋なロジック（日付・カテゴリ）は `src/lib/` にあり、単体テストはここに置く。
 - **import のパス**: `src/` 内でフォルダーをまたぐ import は `@/`（= `src/`）で書く。同じフォルダー内は `./`。`src/` で `../` を書くと lint がエラーにする。対応は `vite.config.ts` の `resolve.alias` と `tsconfig.app.json` の `paths` の2か所に書いている。設定ファイル（`vite.config.ts`、`.storybook/main.ts`）は Vite を通さずに読み込まれるため、相対パスのままにする。
 - **配色**: 明るい配色と暗い配色を、端末の設定（`prefers-color-scheme`）で切り替える。色は `src/styles/global.css` の `:root` に `light-dark(明, 暗)` で書き、CSS や TSX に色を直接書かない（ビルドが古いブラウザー向けに変換する）。色を変えたら `src/styles/palette.test.ts`（コントラスト比）と `docs/05-surface.md` 2章の表も直す。`index.html` の `theme-color` と `e2e/theme.spec.ts` にも地の色を書いている。Storybook はツールバーの「配色」で切り替える（`:root[data-theme]`）。
