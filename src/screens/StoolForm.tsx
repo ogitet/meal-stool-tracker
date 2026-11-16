@@ -5,7 +5,7 @@ import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { DateTitle } from "@/components/DateTitle";
 import { Header } from "@/components/Header";
 import { Segment } from "@/components/Segment";
-import { Loading } from "@/components/Status";
+import { ErrorRetry, Loading } from "@/components/Status";
 import { StoolMark } from "@/components/StoolMark";
 import { useToast } from "@/components/Toast";
 import { createStool, deleteStool, getStool, updateStool } from "@/data/stools";
@@ -40,6 +40,8 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
 
   const [loaded, setLoaded] = useState(!editId);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [shape, setShape] = useState<Shape | null>(null);
   const [amount, setAmount] = useState<Amount | null>(null);
   const [feeling, setFeeling] = useState<Feeling | null>(null);
@@ -72,11 +74,11 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
         setTimeStr(format(s.occurredAt, "HH:mm"));
         setLoaded(true);
       })
-      .catch(() => alive && setError("読み込めませんでした"));
+      .catch(() => alive && setLoadError(true));
     return () => {
       alive = false;
     };
-  }, [uid, editId]);
+  }, [uid, editId, attempt]);
 
   if (notFound) return <Navigate to="/" replace />;
 
@@ -145,7 +147,17 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
       <div className="paper">
         <div className="main pad">
           {!loaded ? (
-            <Loading />
+            loadError ? (
+              <ErrorRetry
+                message="読み込めませんでした"
+                onRetry={() => {
+                  setLoadError(false);
+                  setAttempt((n) => n + 1);
+                }}
+              />
+            ) : (
+              <Loading />
+            )
           ) : (
             <>
               <div className="fl" id="lbl-shape">

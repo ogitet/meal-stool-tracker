@@ -4,7 +4,7 @@ import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { DateTitle } from "@/components/DateTitle";
 import { Header } from "@/components/Header";
 import { Segment } from "@/components/Segment";
-import { Loading } from "@/components/Status";
+import { ErrorRetry, Loading } from "@/components/Status";
 import { useToast } from "@/components/Toast";
 import { createMeal, deleteMeal, findPreviousMeal, fixedMealId, getMeal, updateMealCategories } from "@/data/meals";
 import { useUserData } from "@/data/UserDataContext";
@@ -46,6 +46,8 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
   const [existing, setExisting] = useState<Meal | null | undefined>(undefined); // undefined = 読み込み中
   const [selected, setSelected] = useState<string[]>(() => (location.state as CarriedState | null)?.selected ?? []);
   const [previous, setPrevious] = useState<Meal | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState(false);
@@ -64,11 +66,11 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
         setExisting(m);
         if (m) setSelected(m.categoryIds);
       })
-      .catch(() => alive && setError("読み込めませんでした"));
+      .catch(() => alive && setLoadError(true));
     return () => {
       alive = false;
     };
-  }, [uid, date, slot, otherId]);
+  }, [uid, date, slot, otherId, attempt]);
 
   const isEdit = existing != null;
   const isNewFixed = existing === null && slot !== "other";
@@ -181,7 +183,15 @@ function MealFormInner({ date, slot, otherId }: { date: string; slot: Slot; othe
         )}
 
         <div className="main pad">
-          {existing === undefined || categories.loading ? (
+          {existing === undefined && loadError ? (
+            <ErrorRetry
+              message="読み込めませんでした"
+              onRetry={() => {
+                setLoadError(false);
+                setAttempt((n) => n + 1);
+              }}
+            />
+          ) : existing === undefined || categories.loading ? (
             <Loading />
           ) : (
             GROUPS.map((g) => {
