@@ -9,7 +9,10 @@ export interface CategoriesState {
   byId: Map<string, Category>;
   loading: boolean;
   error: string | null;
+  retry: () => void;
 }
+
+const noop = () => {};
 
 export function useCategories(_uid: string): CategoriesState {
   const v = useStoreVersion();
@@ -21,6 +24,7 @@ export function useCategories(_uid: string): CategoriesState {
       byId: new Map(all.map((c) => [c.id, c])),
       loading: false,
       error: null,
+      retry: noop,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v]);

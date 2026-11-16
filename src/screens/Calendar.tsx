@@ -197,7 +197,17 @@ function WeekView({ anchor, today, onRetry }: { anchor: Date; today: DateKey; on
   const error = meals.error ?? stools.error ?? categories.error;
   const loading = meals.loading || stools.loading || categories.loading;
 
-  if (error) return <ErrorRetry message={error} onRetry={onRetry} />;
+  if (error) {
+    return (
+      <ErrorRetry
+        message={error}
+        onRetry={() => {
+          if (categories.error) categories.retry();
+          onRetry();
+        }}
+      />
+    );
+  }
 
   return (
     <div aria-busy={loading}>

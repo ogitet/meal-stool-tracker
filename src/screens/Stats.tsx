@@ -79,7 +79,17 @@ function MonthStats({ anchor, onRetry }: { anchor: Date; onRetry: () => void }) 
   const recorded = useMemo(() => countRecordedDays(meals.items), [meals.items]);
   const error = meals.error ?? categories.error;
 
-  if (error) return <ErrorRetry message={error} onRetry={onRetry} />;
+  if (error) {
+    return (
+      <ErrorRetry
+        message={error}
+        onRetry={() => {
+          if (categories.error) categories.retry();
+          onRetry();
+        }}
+      />
+    );
+  }
   if (meals.loading || categories.loading) return <Loading />;
   if (recorded === 0) return <p className="status">この月の食事の記録はありません</p>;
 
