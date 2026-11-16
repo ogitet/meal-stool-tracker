@@ -24,7 +24,7 @@ const MARKS: Record<Shape, ReactNode> = {
 };
 
 /** 便マーク4種（Surface 3章）。輪郭の形に加え、茶色の濃淡（硬い=濃→下痢=黄土）でも区別する。 */
-export function StoolMark({ shape, size = 18, color }: { shape: Shape; size?: number; color?: string }) {
+export function StoolMark({ shape, size = 18 }: { shape: Shape; size?: number }) {
   return (
     <svg
       className={`mk mk-${shape}`}
@@ -33,7 +33,6 @@ export function StoolMark({ shape, size = 18, color }: { shape: Shape; size?: nu
       viewBox="0 0 18 18"
       role="img"
       aria-label={SHAPE_LABEL[shape]}
-      style={color ? { color } : undefined}
     >
       {MARKS[shape]}
     </svg>

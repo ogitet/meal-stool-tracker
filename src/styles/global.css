@@ -1,32 +1,41 @@
 /*
  * 日めくり × 判子（docs/05-surface.md）。
  * コバルトの地に白い紙片を重ね、日付は太いディドニ体の数字、食べたものは色インクの印で示す。
+ *
+ * 配色は端末の設定（prefers-color-scheme）に従う。色は light-dark(明るい配色, 暗い配色) で1か所に書く。
+ * 暗い配色でも「地 < 紙（淡）< 紙」の順に明るくし、墨は淡い色に、墨の上の文字（--on-ink）は暗い色に入れ替わる。
+ * 印の色は両方の配色で同じ。「その他」だけは墨なので入れ替える。値を変えたら palette.test.ts でコントラスト比を確かめる。
  */
 :root {
-  --ground: #cfddf6;
-  --on-ground: #252a4a;
-  --accent: #4a62bc;
-  --accent-deep: #3c52a8;
-  --paper: #fff;
-  --paper-2: #f3f6fd;
-  --ink: #252a4a;
-  --muted: #4d5373;
-  --line: #dde3f2;
-  --danger: #b8321f;
-  --veil: rgb(255 255 255 / 55%);
-  --shade: rgb(60 80 140 / 35%);
-  --s-hard: #7a4a1e;
-  --s-normal: #a0692f;
-  --s-soft: #c48a3f;
-  --s-diarrhea: #d9a441;
+  --ground: light-dark(#cfddf6, #0f1322);
+  --on-ground: light-dark(#252a4a, #e4e8f7);
+  --accent: light-dark(#4a62bc, #8ea4f0);
+  --on-accent: light-dark(#fff, #10142a);
+  --accent-deep: light-dark(#3c52a8, #a9bbff);
+  --paper: light-dark(#fff, #20263f);
+  --paper-2: light-dark(#f3f6fd, #181d32);
+  --paper-far: light-dark(rgb(255 255 255 / 32%), rgb(255 255 255 / 4%));
+  --ink: light-dark(#252a4a, #e4e8f7);
+  --on-ink: light-dark(#fff, #181d32);
+  --muted: light-dark(#4d5373, #a3aac8);
+  --line: light-dark(#dde3f2, #343b5c);
+  --danger: light-dark(#b8321f, #f28b78);
+  --on-danger: light-dark(#fff, #2a0d08);
+  --veil: light-dark(rgb(255 255 255 / 55%), rgb(255 255 255 / 10%));
+  --shade: light-dark(rgb(60 80 140 / 35%), rgb(0 0 0 / 60%));
+  --dim: light-dark(rgb(37 42 74 / 42%), rgb(0 0 0 / 60%));
+  --s-hard: light-dark(#7a4a1e, #a87244);
+  --s-normal: light-dark(#a0692f, #c08a4c);
+  --s-soft: light-dark(#c48a3f, #d8a55a);
+  --s-diarrhea: light-dark(#d9a441, #ecc468);
   --g-staple-bg: #f2c14e;
   --g-staple-fg: #3a2a00;
   --g-protein-bg: #c4472f;
   --g-protein-fg: #fff;
   --g-vegetable-bg: #2d7f63;
   --g-vegetable-fg: #fff;
-  --g-other-bg: #2e3354;
-  --g-other-fg: #fff;
+  --g-other-bg: light-dark(#2e3354, #dfe4f5);
+  --g-other-fg: light-dark(#fff, #1a1f36);
   --g-sweets-bg: #f4a8c4;
   --g-sweets-fg: #4a0a2a;
   --font-jp: "Zen Kaku Gothic Antique", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -36,7 +45,16 @@
   --top-gap: 30px;
   --focus: var(--accent-deep);
 
+  color-scheme: light dark;
+}
+
+/* 端末の設定によらず配色を決める（Storybook の切り替えが使う） */
+:root[data-theme="light"] {
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 * {
@@ -194,7 +212,7 @@ p {
   font-size: 11px;
   line-height: 1;
   border-radius: 50%;
-  box-shadow: inset 0 0 0 1.5px rgb(37 42 74 / 55%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in sRGB, var(--on-ground) 55%, transparent);
 }
 
 .hd-r {
@@ -264,7 +282,7 @@ p {
 }
 
 .btn.pri {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
 }
 
@@ -287,7 +305,7 @@ p {
 
 .btn.del {
   flex: none;
-  color: #fff;
+  color: var(--on-danger);
   background: var(--danger);
 }
 
@@ -298,7 +316,7 @@ p {
 }
 
 .btn.inv {
-  color: #fff;
+  color: var(--on-ink);
   background: var(--ink);
 }
 
@@ -331,7 +349,7 @@ p {
 }
 
 .seg > button[aria-pressed="true"] {
-  color: #fff;
+  color: var(--on-ink);
   background: var(--ink);
 }
 
@@ -363,7 +381,7 @@ p {
 
 .seg.sm > button[aria-pressed="true"] {
   color: var(--accent-deep);
-  background: #fff;
+  background: var(--paper);
   box-shadow: 0 2px 6px -2px var(--shade);
 }
 
@@ -437,7 +455,7 @@ p {
 
 .chip[aria-pressed="true"] {
   font-weight: 900;
-  color: #fff;
+  color: var(--on-ink);
   background: var(--ink);
   animation: press 0.28s var(--ease);
 }
@@ -482,6 +500,11 @@ p {
 
 .chip.shape::before {
   content: none;
+}
+
+/* 選択中の便マークは、チップの文字と同じ色にする */
+.chip.shape[aria-pressed="true"] .mk {
+  color: inherit;
 }
 
 @keyframes press {
@@ -657,7 +680,7 @@ p {
   font-weight: 900;
   cursor: pointer;
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1.5px rgb(37 42 74 / 50%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in sRGB, var(--on-ground) 50%, transparent);
 }
 
 .pill:active {
@@ -746,10 +769,10 @@ p {
 
 .slip.future {
   min-height: 52px;
-  color: rgb(37 42 74 / 50%);
+  color: color-mix(in sRGB, var(--on-ground) 50%, transparent);
   cursor: default;
   background: transparent;
-  box-shadow: inset 0 0 0 1.5px rgb(37 42 74 / 16%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in sRGB, var(--on-ground) 16%, transparent);
 }
 
 .dt {
@@ -784,7 +807,7 @@ p {
   margin: -2px 0;
   font-size: 20px;
   line-height: 34px;
-  color: #fff;
+  color: var(--on-accent);
   text-align: center;
   background: var(--accent);
   border-radius: 50%;
@@ -909,13 +932,13 @@ p {
 
 .mc.today .md {
   font-size: 13px;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
 }
 
 .mc.om {
   color: var(--muted);
-  background: rgb(255 255 255 / 32%);
+  background: var(--paper-far);
 }
 
 .mc.om .mk {
@@ -923,10 +946,10 @@ p {
 }
 
 .mc.future {
-  color: rgb(37 42 74 / 45%);
+  color: color-mix(in sRGB, var(--on-ground) 45%, transparent);
   cursor: default;
   background: transparent;
-  box-shadow: inset 0 0 0 1.5px rgb(37 42 74 / 14%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in sRGB, var(--on-ground) 14%, transparent);
 }
 
 .mm {
@@ -976,7 +999,7 @@ p {
   height: 22px;
   font-size: 13px;
   line-height: 22px;
-  color: #fff;
+  color: var(--on-accent);
   text-align: center;
   letter-spacing: 0;
   content: "＋";
@@ -1092,7 +1115,7 @@ p {
   height: 20px;
   font-size: 12px;
   line-height: 20px;
-  color: #fff;
+  color: var(--on-accent);
   text-align: center;
   content: "＋";
   background: var(--accent);
@@ -1415,7 +1438,7 @@ select.inp {
 .login .inp {
   height: 50px;
   color: var(--ink);
-  background: #fff;
+  background: var(--paper);
   border-radius: 14px;
 }
 
@@ -1463,7 +1486,7 @@ select.inp {
   padding: 10px 20px;
   font-size: 13px;
   font-weight: 900;
-  color: #fff;
+  color: var(--on-ink);
   letter-spacing: 0.06em;
   white-space: nowrap;
   pointer-events: none;
@@ -1492,7 +1515,7 @@ select.inp {
   z-index: 30;
   padding: 0;
   margin: 0;
-  background: rgb(37 42 74 / 42%);
+  background: var(--dim);
   border: 0;
   animation: fade 0.2s;
 }
