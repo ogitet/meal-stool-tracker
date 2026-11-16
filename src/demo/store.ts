@@ -5,6 +5,7 @@
  */
 import { useEffect, useState } from "react";
 import { addDays } from "date-fns";
+import { isOnline, queuedWrite } from "@/data/write";
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
 import { toKey } from "@/lib/date";
 import type { Category, Meal, Shape, Slot, Stool } from "@/lib/types";
@@ -32,6 +33,35 @@ export function useStoreVersion(): number {
     };
   }, []);
   return v;
+}
+
+/** オフラインの間に受け付けた記録の ID（未同期）。通信が戻ると空にする。 */
+export const pendingIds = new Set<string>();
+let reconnect: Promise<void> | null = null;
+
+/**
+ * 書き込みを受け付ける。Firestore 実装と同じく、オフラインでもメモリ内にはすぐ反映し、
+ * 通信が戻るまで未同期として数える（E2E でオフラインの表示を確かめるため）。
+ */
+export function accept(id: string): void {
+  if (!isOnline()) {
+    pendingIds.add(id);
+    reconnect ??= new Promise<void>((resolve) => {
+      window.addEventListener(
+        "online",
+        () => {
+          reconnect = null;
+          pendingIds.clear();
+          resolve();
+          emit();
+        },
+        { once: true },
+      );
+    });
+    const wait = reconnect;
+    queuedWrite(() => wait);
+  }
+  emit();
 }
 
 let seq = 0;

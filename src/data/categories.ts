@@ -1,7 +1,6 @@
 import {
   collection,
   doc,
-  getDocs,
   onSnapshot,
   setDoc,
   updateDoc,
@@ -14,7 +13,8 @@ import { db } from "@/firebase";
 import { DEFAULT_CATEGORIES } from "@/lib/constants";
 import { sortCategories } from "@/lib/categories";
 import type { Category, GroupId } from "@/lib/types";
-import { guardedWrite } from "./write";
+import { getDocsOfflineAware } from "./read";
+import { queuedWrite } from "./write";
 
 function col(uid: string) {
   return collection(db, "users", uid, "categories");
@@ -78,14 +78,14 @@ export function useCategories(uid: string): CategoriesState {
 
 async function seedDefaults(uid: string): Promise<void> {
   // 別端末との競合に備え、投入直前にもう一度空かを確認する。
-  const snap = await getDocs(col(uid));
+  const snap = await getDocsOfflineAware(col(uid));
   if (!snap.empty) return;
   const batch = writeBatch(db);
   for (const c of DEFAULT_CATEGORIES) {
     const { id, ...rest } = c;
     batch.set(doc(col(uid), id), { ...rest, active: true });
   }
-  await guardedWrite(() => batch.commit());
+  queuedWrite(() => batch.commit());
 }
 
 export async function addCategory(
@@ -96,7 +96,7 @@ export async function addCategory(
   const inGroup = existing.filter((c) => c.group === input.group);
   const order = inGroup.reduce((m, c) => Math.max(m, c.order), -1) + 1;
   const ref = doc(col(uid));
-  await guardedWrite(() => setDoc(ref, { ...input, active: true, order }));
+  queuedWrite(() => setDoc(ref, { ...input, active: true, order }));
 }
 
 export async function updateCategory(
@@ -104,7 +104,7 @@ export async function updateCategory(
   id: string,
   patch: Partial<Pick<Category, "name" | "abbr" | "group" | "active" | "order">>,
 ): Promise<void> {
-  await guardedWrite(() => updateDoc(doc(col(uid), id), patch));
+  queuedWrite(() => updateDoc(doc(col(uid), id), patch));
 }
 
 /** 同じグループ内での名称の重複は保存できない（Structure 7章）。 */

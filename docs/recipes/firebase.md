@@ -32,7 +32,7 @@
 
 - `src/data/useAuth.ts`（`useAuth`、`login`、`logout`、`loginErrorMessage`）と、データごとのファイルを Firestore で実装する。モデルは `users/{uid}/{コレクション}`。
 - 同じ公開 API の実装を `src/demo/` に置き、`src/demo/vite-plugin.ts` の正規表現に名前を足す。デモの `useAuth` は、常にログイン済みのユーザーを返す。
-- 書き込みは `src/data/write.ts` の `guardedWrite` を通す。Firestore の書き込みは通信できないと完了を待ち続けるため、オフラインの検知と8秒の時間上限で失敗にし、`writeErrorMessage` でトースト用の文言にする。
+- オフラインでも記録できるよう、`initializeFirestore` の `localCache` に `persistentLocalCache` を指定する。書き込みは `src/data/write.ts` の `queuedWrite` を通す。Firestore の書き込みの Promise はサーバーに届くまで完了しないため、完了を待たずに戻り、未同期の件数と後から分かった失敗を数えて画面に示す。1件の読み込みは `getDocFromCache` を先に試す（`getDoc` は通信の状態が分かるまで待つため）。
 - `src/App.tsx` で、未ログインなら `Login` 画面だけを表示する。全画面で共有するデータは、ログイン後に Context で1回だけ購読する。
 - アプリに登録画面を作らない場合、ユーザーは Firebase コンソールで追加し、Authentication の設定で新規登録をオフにする。
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { SyncNotice } from "./components/SyncNotice";
 import { ToastProvider } from "./components/Toast";
 import { useAuth } from "./data/useAuth";
 import { UserDataProvider } from "./data/UserDataContext";
@@ -47,6 +48,7 @@ export function App() {
     <UserDataProvider uid={user.uid}>
       <ToastProvider>
         <RouterProvider router={router} />
+        <SyncNotice />
       </ToastProvider>
     </UserDataProvider>
   );

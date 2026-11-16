@@ -2,8 +2,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
-  getDocs,
   limit,
   onSnapshot,
   orderBy,
@@ -19,7 +17,8 @@ import {
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import type { DateKey, Meal, Slot } from "@/lib/types";
-import { guardedWrite } from "./write";
+import { ESTIMATE, getDocCacheFirst, getDocsOfflineAware } from "./read";
+import { queuedWrite } from "./write";
 
 function col(uid: string) {
   return collection(db, "users", uid, "meals");
@@ -35,7 +34,7 @@ function toDate(v: unknown): Date | null {
 }
 
 function fromDoc(d: DocumentSnapshot<DocumentData>): Meal | null {
-  const v = d.data();
+  const v = d.data(ESTIMATE);
   if (!v) return null;
   return {
     id: d.id,
@@ -44,6 +43,7 @@ function fromDoc(d: DocumentSnapshot<DocumentData>): Meal | null {
     categoryIds: Array.isArray(v.categoryIds) ? v.categoryIds.map(String) : [],
     createdAt: toDate(v.createdAt),
     updatedAt: toDate(v.updatedAt),
+    ...(d.metadata.hasPendingWrites ? { pending: true } : {}),
   };
 }
 
@@ -59,8 +59,10 @@ export function useMealsInRange(uid: string, start: DateKey, end: DateKey): Rang
   useEffect(() => {
     setState((s) => ({ ...s, loading: true, error: null }));
     const q = query(col(uid), where("date", ">=", start), where("date", "<=", end));
+    // 未同期の印（pending）を外すため、サーバーに届いたときの変化も受け取る
     return onSnapshot(
       q,
+      { includeMetadataChanges: true },
       (snap) => {
         const items = snap.docs.map(fromDoc).filter((m): m is Meal => m !== null);
         setState({ items, loading: false, error: null });
@@ -72,25 +74,25 @@ export function useMealsInRange(uid: string, start: DateKey, end: DateKey): Rang
 }
 
 export async function getMeal(uid: string, id: string): Promise<Meal | null> {
-  const snap = await getDoc(doc(col(uid), id));
-  return fromDoc(snap);
+  const snap = await getDocCacheFirst(doc(col(uid), id));
+  return snap ? fromDoc(snap) : null;
 }
 
 /** 新規作成。固定枠はIDを決めて上書き保存、その他の食事は自動ID。 */
 export async function createMeal(uid: string, date: DateKey, slot: Slot, categoryIds: string[]): Promise<string> {
   const ref = slot === "other" ? doc(col(uid)) : doc(col(uid), fixedMealId(date, slot));
-  await guardedWrite(() =>
+  queuedWrite(() =>
     setDoc(ref, { date, slot, categoryIds, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }),
   );
   return ref.id;
 }
 
 export async function updateMealCategories(uid: string, id: string, categoryIds: string[]): Promise<void> {
-  await guardedWrite(() => updateDoc(doc(col(uid), id), { categoryIds, updatedAt: serverTimestamp() }));
+  queuedWrite(() => updateDoc(doc(col(uid), id), { categoryIds, updatedAt: serverTimestamp() }));
 }
 
 export async function deleteMeal(uid: string, id: string): Promise<void> {
-  await guardedWrite(() => deleteDoc(doc(col(uid), id)));
+  queuedWrite(() => deleteDoc(doc(col(uid), id)));
 }
 
 /**
@@ -109,7 +111,7 @@ export async function findPreviousMeal(
     orderBy("date", "desc"),
     limit(1),
   );
-  const snap = await getDocs(q);
+  const snap = await getDocsOfflineAware(q);
   const first = snap.docs[0];
   return first ? fromDoc(first) : null;
 }

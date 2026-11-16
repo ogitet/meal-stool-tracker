@@ -3,6 +3,7 @@ import { useState } from "react";
 import { fn } from "storybook/test";
 import { ConfirmSheet } from "./ConfirmSheet";
 import { ErrorRetry, Loading } from "./Status";
+import { SyncBadge } from "./SyncNotice";
 import { useToast } from "./Toast";
 
 const meta = {
@@ -53,6 +54,19 @@ function ToastDemo() {
     </div>
   );
 }
+
+/** 画面の上端に出る。オフラインでも記録でき、通信が戻ると自動で同期する。 */
+export const SyncOffline: Story = {
+  name: "同期の札（オフライン）",
+  render: () => <SyncBadge online={false} pending={false} />,
+};
+
+export const SyncOfflinePending: Story = {
+  name: "同期の札（オフライン・未同期あり）",
+  render: () => <SyncBadge online={false} pending />,
+};
+
+export const SyncSyncing: Story = { name: "同期の札（同期中）", render: () => <SyncBadge online pending /> };
 
 /** 保存・削除のあとに2秒だけ出る。 */
 export const Toast: Story = { name: "トースト", render: () => <ToastDemo /> };

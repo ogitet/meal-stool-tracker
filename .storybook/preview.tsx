@@ -3,6 +3,7 @@
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router-dom";
+import { SyncNotice } from "../src/components/SyncNotice";
 import { ToastProvider } from "../src/components/Toast";
 import { UserDataProvider } from "../src/data/UserDataContext";
 import "../src/styles/global.css";
@@ -62,6 +63,7 @@ const withApp: Decorator = (Story, { parameters }) => {
         <StoryElement.Provider value={<Story />}>
           <RouterProvider router={router} />
         </StoryElement.Provider>
+        <SyncNotice />
       </ToastProvider>
     </UserDataProvider>
   );
