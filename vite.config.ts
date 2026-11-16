@@ -8,10 +8,10 @@ import { demoData } from "./src/demo/vite-plugin";
 
 // アイコンの中身から作る版番号。iOS はホーム画面のアイコンを強くキャッシュするため、
 // URL を変えて取り直させる。アイコンを作り直せば、自動で値が変わる。
-const ICON_VERSION = createHash("sha1")
-  .update(["icon-192", "icon-512", "apple-touch-icon"].map((n) => readFileSync(`public/icons/${n}.png`)).join(""))
-  .digest("hex")
-  .slice(0, 8);
+// 画像のバイト列をそのままハッシュに渡す（文字列にすると、UTF-8 として読めないバイトが同じ文字に置き換わる）。
+const iconHash = createHash("sha1");
+for (const n of ["icon-192", "icon-512", "apple-touch-icon"]) iconHash.update(readFileSync(`public/icons/${n}.png`));
+const ICON_VERSION = iconHash.digest("hex").slice(0, 8);
 
 function iconCacheBuster(): Plugin {
   return {
