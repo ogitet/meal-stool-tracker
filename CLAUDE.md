@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ツールチェーンは Vite+（`vp`）。lint は oxlint、整形は oxfmt（幅 120）、テストは vitest 互換。HTML・JSX は markuplint、CSS は stylelint で別に検査する。Node の版は `.node-version` と `package.json` の `volta.node` の2か所に書き、一致をテストが検証する。
 
 ```bash
-npm run dev            # :5173。.env.local に Firebase の設定が必要（README は .env.example を案内するが、リポジトリには無い）
+npm run dev            # :5173。.env.local に Firebase の設定が必要（項目は .env.example）
 npm run demo           # :5199。例データで全画面を表示（Firebase 不要）
 npm run storybook      # :6006
 npm run check          # 整形・lint・型チェック（--fix で自動修正）。CI と同じ
