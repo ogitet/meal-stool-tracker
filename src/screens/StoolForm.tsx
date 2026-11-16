@@ -12,6 +12,7 @@ import { createStool, deleteStool, getStool, updateStool } from "@/data/stools";
 import { useUserData } from "@/data/UserDataContext";
 import { writeErrorMessage } from "@/data/write";
 import { useNav } from "@/hooks/useNav";
+import { useToday } from "@/hooks/useToday";
 import { AMOUNT_LABEL, AMOUNTS, FEELING_LABEL, FEELINGS, SHAPE_LABEL, SHAPES } from "@/lib/constants";
 import { initialOccurredAt, isDateKey, isFuture, todayKey, toKey } from "@/lib/date";
 import type { Amount, Feeling, Shape } from "@/lib/types";
@@ -48,6 +49,10 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState(false);
 
+  // 今日の記録として開いたか。開いたまま日付が変わっても、保存した時点の日付と時刻で記録する
+  const [forToday] = useState(() => newDate === todayKey());
+  const today = useToday();
+
   const back = () => nav.back(`/day/${dateStr}`);
 
   useEffect(() => {
@@ -76,7 +81,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   if (notFound) return <Navigate to="/" replace />;
 
   function occurredAt(): Date | null {
-    if (!editId) return initialOccurredAt(newDate ?? todayKey());
+    if (!editId) return initialOccurredAt(forToday || !newDate ? todayKey() : newDate);
     const d = parse(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", new Date());
     return isValid(d) ? d : null;
   }
@@ -128,7 +133,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
             キャンセル
           </button>
         }
-        title={<DateTitle date={newDate ?? dateStr} />}
+        title={<DateTitle date={newDate ? (forToday ? today : newDate) : dateStr} />}
         right={
           editId ? (
             <button type="button" className="lnk" onClick={() => setConfirm(true)}>

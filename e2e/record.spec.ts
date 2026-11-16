@@ -125,3 +125,38 @@ test("未来の日は開けない", async ({ page }) => {
   await page.goto(`/day/${dateKey(1)}`);
   await expectPath(page, "/");
 });
+
+test.describe("開いたまま日付が変わったとき", () => {
+  const nextDay = dateKey(1);
+
+  test("「食事」は押した時点の日付で開く", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-11-11T23:50:00+09:00"));
+    await page.goto("/");
+    await page.clock.setFixedTime(new Date("2026-11-12T08:00:00+09:00"));
+    await page.locator(".btn.rec", { hasText: "食事" }).click();
+    await expectPath(page, `/meal/${nextDay}/breakfast`);
+  });
+
+  test("画面に戻ると、今日の印が新しい日付に移る", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-11-11T23:50:00+09:00"));
+    await page.goto("/");
+    await expect(page.locator(".slip.today .dn")).toHaveText("11");
+    await page.clock.setFixedTime(new Date("2026-11-12T08:00:00+09:00"));
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+    await expect(page.locator(".slip.today .dn")).toHaveText("12");
+  });
+
+  test("便は保存した時点の日付と時刻で記録する", async ({ page }) => {
+    await page.clock.setFixedTime(new Date("2026-11-11T23:59:00+09:00"));
+    await page.goto("/");
+    await page.locator(".btn.rec", { hasText: "便" }).click();
+    await page.locator(".chip.shape", { hasText: "普通" }).click();
+    await page.clock.setFixedTime(new Date("2026-11-12T00:01:00+09:00"));
+    await saveButton(page).click();
+
+    await expectPath(page, "/");
+    await page.locator(".slip.today").click();
+    await expectPath(page, `/day/${nextDay}`);
+    await expect(page.locator(".dr .tm")).toHaveText(["00:01"]);
+  });
+});
