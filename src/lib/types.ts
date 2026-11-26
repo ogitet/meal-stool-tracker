@@ -37,3 +37,23 @@ export interface Stool {
   /** 端末に保存済みで、まだサーバーに届いていない（未同期） */
   pending?: boolean;
 }
+
+/** 減らしたいもの（reduce）と続けたいこと（keep）。各1つで固定（Scope 第2版 Q59）。 */
+export type HabitKind = "reduce" | "keep";
+
+/** 減らしたいもの・続けたいことの項目（Scope 第2版 F-15）。 */
+export interface HabitItem {
+  id: string;
+  kind: HabitKind;
+  name: string;
+  /** カレンダーの印に使う1文字 */
+  abbr: string;
+  active: boolean;
+  order: number;
+}
+
+/** 「その日にその項目が起きた」の記録。同じ日の同じ項目は1件（Scope 第2版 Q51）。 */
+export interface Mark {
+  date: DateKey;
+  itemId: string;
+}

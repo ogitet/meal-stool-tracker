@@ -38,6 +38,7 @@
   --g-other-fg: light-dark(#fff, #1a1f36);
   --g-sweets-bg: #f4a8c4;
   --g-sweets-fg: #4a0a2a;
+  --clean: light-dark(#d3efdf, #1f3d36);
   --font-jp: "Zen Kaku Gothic Antique", -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
   --font-num: "DM Sans", "Zen Kaku Gothic Antique", "Hiragino Sans", sans-serif;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);

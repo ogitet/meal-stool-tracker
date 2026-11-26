@@ -23,6 +23,15 @@ const router = createBrowserRouter([
   { path: "/categories", element: <CategoryList /> },
   { path: "/categories/:id", element: <CategoryEdit /> },
   { path: "/stats", element: <Stats /> },
+  // 習慣カレンダーの試作（Scope 第2版）。デモモードだけで開ける。本番のビルドには含めない
+  ...(import.meta.env.MODE === "demo"
+    ? [
+        {
+          path: "/proto",
+          lazy: async () => ({ Component: (await import("@/demo/proto/HabitCalendar")).HabitCalendar }),
+        },
+      ]
+    : []),
   { path: "*", element: <Navigate to="/" replace /> },
 ]);
 

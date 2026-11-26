@@ -1,0 +1,267 @@
+/*
+ * 習慣カレンダーの試作（Scope 第2版）。デモモードの /proto だけが読み込む。
+ * 色は global.css の :root の値だけを使う。
+ */
+
+/* 上部の数字 */
+.hc-nums {
+  display: grid;
+  flex: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 0 8px 6px;
+}
+
+.hc-card {
+  padding: 7px 10px 8px;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: 14px;
+  box-shadow: 0 6px 14px -10px var(--shade);
+}
+
+.hc-card h2 {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.hc-big-n {
+  display: flex;
+  gap: 2px;
+  align-items: baseline;
+  margin: 1px 0 2px;
+}
+
+.hc-big-n .num {
+  font-family: var(--font-num);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.hc-big-n small {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.hc-cap {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hc-sub {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.hc-sub b {
+  font-family: var(--font-num);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* 月のマス：日付と運動の印 → 食べたものの印 → 便 */
+.hc-main {
+  padding-bottom: 0;
+}
+
+.mc.hc-c {
+  gap: 2px;
+  align-items: stretch;
+  height: 58px;
+  padding: 4px 3px 0;
+}
+
+.hc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 18px;
+}
+
+.hc-c .md {
+  width: 20px;
+  height: 18px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.hc-c.today .md {
+  width: 18px;
+  font-size: 11px;
+}
+
+.hc-ex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.hc-food {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  height: 19px;
+}
+
+.t.hc-t {
+  width: 19px;
+  height: 19px;
+  font-size: 12px;
+  border-radius: 5px;
+  rotate: -2deg;
+}
+
+.t.hc-t + .t.hc-t {
+  rotate: 2deg;
+}
+
+.hc-stl {
+  display: flex;
+  gap: 1px;
+  align-items: center;
+  justify-content: center;
+  height: 11px;
+}
+
+.hc-stl .more {
+  font-size: 9px;
+  line-height: 11px;
+}
+
+/* 食べなかった日（起点日以降の過去の日で、食べていない日）を淡く塗る。?v=b では塗らない */
+.hc-grid.tint .mc.clean {
+  background: var(--clean);
+}
+
+.hc-grid.tint .mc.om.clean {
+  background: color-mix(in sRGB, var(--clean) 45%, transparent);
+}
+
+/* 記録の開始 */
+.bar.hc-bar {
+  padding-top: 4px;
+}
+
+.btn.rec.hc-rec {
+  gap: 4px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.btn.rec.hc-rec::before {
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.btn.rec.hc-rec.done {
+  color: var(--g-vegetable-fg);
+  background: var(--g-vegetable-bg);
+}
+
+.btn.rec.hc-rec.done::before {
+  color: var(--g-vegetable-bg);
+  content: "✓";
+  background: var(--g-vegetable-fg);
+}
+
+/* シート */
+.hc-pick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.hc-pick.two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.hc-sheet .btn {
+  flex: none;
+}
+
+.chip.hc-big {
+  min-height: 56px;
+  font-size: 17px;
+}
+
+.hc-stools {
+  padding: 0;
+  margin: 4px 0 0;
+  list-style: none;
+}
+
+.hc-stools button {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+}
+
+.hc-stools button:focus-visible {
+  outline: 2px solid var(--focus);
+}
+
+.hc-stools .num {
+  font-family: var(--font-num);
+  font-weight: 600;
+}
+
+/* 取り消せるトースト（Scope 第2版 Q53） */
+.hc-toast {
+  position: fixed;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 6px 6px 18px;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--on-ink);
+  white-space: nowrap;
+  background: var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px -8px var(--shade);
+  translate: -50% 0;
+  animation: toast 0.3s var(--ease);
+}
+
+.hc-toast button {
+  all: unset;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 32px;
+  color: var(--ink);
+  cursor: pointer;
+  background: var(--on-ink);
+  border-radius: 999px;
+}
+
+.hc-toast button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
