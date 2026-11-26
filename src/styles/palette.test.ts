@@ -59,6 +59,8 @@ const TEXT: [string, string][] = [
   ["g-vegetable-fg", "g-vegetable-bg"],
   ["g-other-fg", "g-other-bg"],
   ["g-sweets-fg", "g-sweets-bg"],
+  // 食べなかった日のマスの日付（Surface 10章）
+  ["ink", "clean"],
 ];
 
 /** 暗い配色で、紙の上に置く印と便マーク。形が見分けられること（3 以上）。 */
@@ -78,6 +80,24 @@ const MARKS = [
 describe.each<Theme>(["light", "dark"])("配色（%s）", (theme) => {
   test.each(TEXT)("--%s／--%s は 4.5 以上", (fg, bg) => {
     expect(contrast(theme, fg, bg)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("食べなかった日の塗り", () => {
+  // マスに載るのは続けたいことの印（緑）と便マーク。食べたものの印は載らない
+  test.each<Theme>(["light", "dark"])("便マーク（硬い・普通）は塗りの上で 3 以上（%s）", (theme) => {
+    expect(contrast(theme, "s-hard", "clean")).toBeGreaterThanOrEqual(3);
+    expect(contrast(theme, "s-normal", "clean")).toBeGreaterThanOrEqual(3);
+  });
+
+  test("緑の印は、明るい配色では塗りの上で 3 以上", () => {
+    expect(contrast("light", "g-vegetable-bg", "clean")).toBeGreaterThanOrEqual(3);
+  });
+
+  // 暗い配色では緑の印と塗りが近いため、印に --mark-ring の縁を付ける。縁は --on-ground と同じ色
+  test("暗い配色では、印の縁（--on-ground と同じ色）が塗りの上で 3 以上", () => {
+    expect(contrast("dark", "on-ground", "clean")).toBeGreaterThanOrEqual(3);
+    expect(contrast("dark", "on-ground", "g-vegetable-bg")).toBeGreaterThanOrEqual(3);
   });
 });
 

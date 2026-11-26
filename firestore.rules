@@ -20,38 +20,67 @@ service cloud.firestore {
     }
 
     // 値の形は、画面が書き込む内容（src/data/）に合わせる。決めていないフィールドは保存させない。
+
+    // 初版のカテゴリと食事記録。消さずに残し、引き継ぎ（Scope F-16）で読むだけにする（06-tech Q73）
     match /users/{uid}/categories/{id} {
       allow read: if isOwner(uid);
-      allow create, update: if isOwner(uid)
-        && request.resource.data.keys().hasOnly(['name', 'abbr', 'group', 'active', 'order'])
-        && request.resource.data.name is string
-        && request.resource.data.name.size() >= 1
-        && request.resource.data.name.size() <= 10
-        && request.resource.data.abbr is string
-        && request.resource.data.abbr.size() >= 1
-        // 略称は1文字。絵文字などは2と数えられることがあるため、2まで通す
-        && request.resource.data.abbr.size() <= 2
-        && request.resource.data.group in ['staple', 'protein', 'vegetable', 'other', 'sweets']
-        && request.resource.data.active is bool
-        && request.resource.data.order is number;
-      // 削除はせず「使わない」にする（Scope Q7）
-      allow delete: if false;
+      allow write: if false;
     }
 
     match /users/{uid}/meals/{id} {
       allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    // 減らしたいもの・続けたいことの項目（06-tech 10章）
+    function isItem(data) {
+      return data.keys().hasOnly(['kind', 'name', 'abbr', 'active', 'order'])
+        && data.kind in ['reduce', 'keep']
+        && data.name is string
+        && data.name.size() >= 1
+        && data.name.size() <= 10
+        && data.abbr is string
+        && data.abbr.size() >= 1
+        // 略称は1文字。絵文字などは2と数えられることがあるため、2まで通す
+        && data.abbr.size() <= 2
+        && data.active is bool
+        && data.order is number;
+    }
+
+    match /users/{uid}/items/{id} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && isItem(request.resource.data);
+      // 種類は変えない（Structure Q70）
+      allow update: if isOwner(uid) && isItem(request.resource.data)
+        && request.resource.data.kind == resource.data.kind;
+      // 削除はせず「使わない」にする（Scope F-15）
+      allow delete: if false;
+    }
+
+    // 記録。文書IDは「日付_項目」で、同じ日の同じ項目を1件にする（06-tech Q72）。
+    // 2台で同時に押したときの上書きも、同じ内容なら通す
+    match /users/{uid}/marks/{id} {
+      allow read: if isOwner(uid);
       allow create, update: if isOwner(uid)
-        && request.resource.data.keys().hasOnly(['date', 'slot', 'categoryIds', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['date', 'itemId', 'createdAt'])
         && isDateKey(request.resource.data.date)
-        && request.resource.data.slot in ['breakfast', 'lunch', 'dinner', 'other']
-        && request.resource.data.categoryIds is list
-        && request.resource.data.categoryIds.size() >= 1
-        // ルールでは配列の全要素を調べられないため、件数の上限と先頭の型だけを確かめる
-        && request.resource.data.categoryIds.size() <= 100
-        && request.resource.data.categoryIds[0] is string
-        && isOptionalTimestamp(request.resource.data, 'createdAt')
-        && isOptionalTimestamp(request.resource.data, 'updatedAt');
+        && request.resource.data.itemId is string
+        && request.resource.data.itemId.size() >= 1
+        && request.resource.data.itemId.size() <= 100
+        && id == request.resource.data.date + '_' + request.resource.data.itemId
+        && isOptionalTimestamp(request.resource.data, 'createdAt');
       allow delete: if isOwner(uid);
+    }
+
+    // 設定（起点日と、引き継ぎ済みか）
+    match /users/{uid}/meta/{id} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && id == 'habits'
+        && request.resource.data.keys().hasOnly(['startDate', 'migrated'])
+        && isDateKey(request.resource.data.startDate)
+        && request.resource.data.migrated is bool;
+      allow delete: if false;
     }
 
     match /users/{uid}/stools/{id} {

@@ -1,17 +1,17 @@
 import { createContext, useContext, type ReactNode } from "react";
-import { useCategories, type CategoriesState } from "./categories";
+import { useHabits, type HabitsState } from "./habits";
 
 interface UserData {
   uid: string;
-  categories: CategoriesState;
+  habits: HabitsState;
 }
 
 const Ctx = createContext<UserData | null>(null);
 
-/** ログイン後に1回だけカテゴリを購読し、全画面で共有する。 */
+/** ログイン後に1回だけ項目と記録を購読し、全画面で共有する（06-tech Q71）。 */
 export function UserDataProvider({ uid, children }: { uid: string; children: ReactNode }) {
-  const categories = useCategories(uid);
-  return <Ctx.Provider value={{ uid, categories }}>{children}</Ctx.Provider>;
+  const habits = useHabits(uid);
+  return <Ctx.Provider value={{ uid, habits }}>{children}</Ctx.Provider>;
 }
 
 export function useUserData(): UserData {

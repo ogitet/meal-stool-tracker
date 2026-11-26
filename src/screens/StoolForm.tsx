@@ -57,7 +57,7 @@ function StoolFormInner({ newDate, editId }: { newDate?: string; editId?: string
   const [forToday] = useState(() => newDate === todayKey());
   const today = useToday();
 
-  const back = () => nav.back(`/day/${validDate}`);
+  const back = () => nav.back(`/?d=${validDate}`);
 
   useEffect(() => {
     if (!editId) return;

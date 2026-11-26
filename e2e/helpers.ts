@@ -2,8 +2,9 @@ import { expect, test as base, type Locator, type Page } from "@playwright/test"
 
 /**
  * テスト内の「現在」。実行する時刻や曜日で結果が変わらないよう、ブラウザの時計を固定する。
- * （「食事」ボタンは時刻から枠を選び、例データは今日を基準に作られるため）
- * 2026-11-11 は水曜。13:00 は昼食の時間帯で、例データの今日は朝食のみ記録済み。
+ * 例データ（src/demo/store.ts）は今日を基準に作られる。2026-11-11 は水曜。
+ * このとき例データは：今月食べた日 11/5・11/9（先月11日までは6日）、食べずに2日・ベスト10日、
+ * 運動は今日まだで連続6日（11/5〜11/10）・ベスト12日・今月9日、起点日は 9/16。
  */
 export const NOW = new Date("2026-11-11T13:00:00+09:00");
 
@@ -33,7 +34,7 @@ export function collectPageErrors(page: Page): string[] {
   return errors;
 }
 
-/** URL の d（表示中の期間の基準日）を返す。 */
+/** URL の d（表示中の月の基準日）を返す。 */
 export function anchorOf(page: Page): string | null {
   return new URL(page.url()).searchParams.get("d");
 }
@@ -87,3 +88,10 @@ export const saveButton = (page: Page): Locator => page.locator(".bar .btn.pri")
 export async function expectPath(page: Page, path: string): Promise<void> {
   await expect.poll(() => new URL(page.url()).pathname).toBe(path);
 }
+
+/** 月カレンダーのマス。読み上げ名の先頭の日付（例：11月10日）で探す。 */
+export const cell = (page: Page, monthDay: string): Locator =>
+  page.getByRole("button", { name: new RegExp(`^${monthDay}( |$)`) });
+
+/** 上部の数字のカード。0 が減らしたいもの、1 が続けたいこと。 */
+export const card = (page: Page, n: 0 | 1): Locator => page.locator(".ncard").nth(n);

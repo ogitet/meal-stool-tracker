@@ -5,33 +5,17 @@ import { ToastProvider } from "./components/Toast";
 import { useAuth } from "./data/useAuth";
 import { UserDataProvider } from "./data/UserDataContext";
 import { Calendar } from "./screens/Calendar";
-import { CategoryEdit } from "./screens/CategoryEdit";
-import { CategoryList } from "./screens/CategoryList";
-import { DayDetail } from "./screens/DayDetail";
+import { ItemEdit } from "./screens/ItemEdit";
+import { ItemList } from "./screens/ItemList";
 import { Login } from "./screens/Login";
-import { MealForm } from "./screens/MealForm";
-import { Stats } from "./screens/Stats";
 import { StoolForm } from "./screens/StoolForm";
 
 // データルーターを使う（画面遷移の View Transitions に必要）。
 const router = createBrowserRouter([
   { path: "/", element: <Calendar /> },
-  { path: "/day/:date", element: <DayDetail /> },
-  { path: "/meal/:date/:slot", element: <MealForm /> },
-  { path: "/meal/:date/:slot/:id", element: <MealForm /> },
   { path: "/stool/:id", element: <StoolForm /> },
-  { path: "/categories", element: <CategoryList /> },
-  { path: "/categories/:id", element: <CategoryEdit /> },
-  { path: "/stats", element: <Stats /> },
-  // 習慣カレンダーの試作（Scope 第2版）。デモモードだけで開ける。本番のビルドには含めない
-  ...(import.meta.env.MODE === "demo"
-    ? [
-        {
-          path: "/proto",
-          lazy: async () => ({ Component: (await import("@/demo/proto/HabitCalendar")).HabitCalendar }),
-        },
-      ]
-    : []),
+  { path: "/items", element: <ItemList /> },
+  { path: "/items/:id", element: <ItemEdit /> },
   { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
