@@ -41,7 +41,7 @@ type Undo = { message: string; date: DateKey; itemId: string; on: boolean };
 
 /**
  * 習慣カレンダーの試作（Scope 第2版 F-10、F-12〜F-14）。デモモードの /proto で開く。
- * ?v=b で、無事故の日を塗らない見せ方に切り替える（見え方の比較用）。
+ * ?v=b で、食べなかった日を塗らない見せ方に切り替える（見え方の比較用）。
  */
 export function HabitCalendar() {
   const [params, setParams] = useSearchParams();
@@ -220,6 +220,13 @@ function hasOn(byDate: Map<DateKey, Mark[]>, date: DateKey, itemId: string): boo
   return (byDate.get(date) ?? []).some((m) => m.itemId === itemId);
 }
 
+/** 先月との比較の見出し（Scope 第2版 Q61）。「先月26日まで」、先月に同じ日がなければ「先月末まで」。 */
+function lastLabel(today: DateKey): string {
+  const t = fromKey(today);
+  const lastEnd = new Date(t.getFullYear(), t.getMonth(), 0).getDate();
+  return t.getDate() >= lastEnd ? "先月末まで" : `先月${t.getDate()}日まで`;
+}
+
 /** 上部の数字（Scope 第2版 F-14）。表示中の月によらず、今日の時点の数字を示す。 */
 function Numbers({
   eaten,
@@ -248,10 +255,10 @@ function Numbers({
           <span className="hc-cap">今月食べた</span>
         </p>
         <p className="hc-sub">
-          先月の同じ時点 <b className="num">{last}</b>日
+          {lastLabel(today)} <b className="num">{last}</b>日
         </p>
         <p className="hc-sub">
-          無事故 <b className="num">{clean}</b>日・ベスト <b className="num">{best}</b>日
+          食べずに <b className="num">{clean}</b>日・ベスト <b className="num">{best}</b>日
         </p>
       </div>
       <div className="hc-card">
@@ -330,7 +337,7 @@ function Month({
             ...food.map((i) => i.name),
             ...keep.map((i) => i.name),
             dayStools.length ? `便${dayStools.length}回` : "",
-            clean ? "無事故" : "",
+            clean ? "食べなかった日" : "",
           ]
             .filter(Boolean)
             .join(" ");

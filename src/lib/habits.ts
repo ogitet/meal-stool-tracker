@@ -42,7 +42,7 @@ export function countLastMonthSoFar(days: ReadonlySet<DateKey>, today: DateKey):
 }
 
 /**
- * 無事故の連続日数（Scope 第2版 F-14、Q55）。最後に食べた日の翌日から今日まで（今日を含む）。
+ * 食べずに続いた日数（Scope 第2版 F-14、Q55）。最後に食べた日の翌日から今日まで（今日を含む）。
  * 今日食べていれば0。起点日以降に一度も食べていなければ、起点日から数える。
  */
 export function cleanStreak(eaten: ReadonlySet<DateKey>, start: DateKey, today: DateKey): number {
@@ -51,7 +51,7 @@ export function cleanStreak(eaten: ReadonlySet<DateKey>, start: DateKey, today: 
   return n;
 }
 
-/** 起点日から今日までで、最も長かった無事故の連続日数（今続いている分を含む）。 */
+/** 起点日から今日までで、最も長かった、食べずに続いた日数（今続いている分を含む）。 */
 export function bestCleanStreak(eaten: ReadonlySet<DateKey>, start: DateKey, today: DateKey): number {
   let best = 0;
   let run = 0;
