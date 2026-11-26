@@ -16,8 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { db } from "@/firebase";
 import { toKey } from "@/lib/date";
-import type { Amount, DateKey, Feeling, Shape, Stool } from "@/lib/types";
-import type { RangeState } from "./meals";
+import type { Amount, DateKey, Feeling, RangeState, Shape, Stool } from "@/lib/types";
 import { getDocCacheFirst } from "./read";
 import { queuedWrite } from "./write";
 

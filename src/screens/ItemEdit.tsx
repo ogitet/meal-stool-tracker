@@ -1,29 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Loading } from "@/components/Status";
 import { useToast } from "@/components/Toast";
-import { addCategory, isDuplicateName, updateCategory } from "@/data/categories";
+import { addItem, updateItem } from "@/data/habits";
 import { useUserData } from "@/data/UserDataContext";
 import { writeErrorMessage } from "@/data/write";
 import { useNav } from "@/hooks/useNav";
-import { abbrIsOneChar, defaultAbbr, nextOrder } from "@/lib/categories";
-import { CATEGORY_NAME_MAX, GROUPS } from "@/lib/constants";
-import type { GroupId } from "@/lib/types";
+import {
+  abbrIsOneChar,
+  canAddItem,
+  defaultAbbr,
+  inkOf,
+  isDuplicateItemName,
+  ITEM_ACTIVE_MAX,
+  ITEM_NAME_MAX,
+  KIND_LABEL,
+} from "@/lib/items";
+import type { HabitKind } from "@/lib/types";
 
-/** S-08 カテゴリ編集。/categories/new で追加、/categories/:id で編集。 */
-export function CategoryEdit() {
+/** S-12 項目編集。/items/new?kind=reduce で追加、/items/:id で編集。種類は変えられない（Structure Q70）。 */
+export function ItemEdit() {
   const { id } = useParams();
-  const { uid, categories } = useUserData();
+  const [params] = useSearchParams();
+  const { uid, habits } = useUserData();
   const nav = useNav();
   const toast = useToast();
   const isNew = id === "new";
-  const target = useMemo(() => (isNew ? null : (categories.byId.get(id ?? "") ?? null)), [isNew, id, categories.byId]);
+  const newKind: HabitKind = params.get("kind") === "keep" ? "keep" : "reduce";
+  const target = useMemo(() => (isNew ? null : (habits.byId.get(id ?? "") ?? null)), [isNew, id, habits.byId]);
+  const kind = target?.kind ?? newKind;
 
   const [name, setName] = useState("");
   const [abbr, setAbbr] = useState("");
   const [abbrTouched, setAbbrTouched] = useState(false);
-  const [group, setGroup] = useState<GroupId>("other");
   const [active, setActive] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,14 +44,13 @@ export function CategoryEdit() {
     setName(target.name);
     setAbbr(target.abbr);
     setAbbrTouched(true);
-    setGroup(target.group);
     setActive(target.active);
     setInitialized(true);
   }, [isNew, target, initialized]);
 
-  if (!isNew && !categories.loading && !target) return <Navigate to="/categories" replace />;
+  if (!isNew && !habits.loading && !target) return <Navigate to="/items" replace />;
 
-  const back = () => nav.back("/categories");
+  const back = () => nav.back("/items");
 
   function onNameChange(v: string) {
     setName(v);
@@ -49,11 +58,14 @@ export function CategoryEdit() {
   }
 
   const trimmed = name.trim();
+  // 「使わない」から「使う」に戻すときも、4つまで（Scope Q57）
+  const overLimit = active && !(target?.active ?? false) && !canAddItem(habits.all, kind);
   const validation = (() => {
     if (!trimmed) return "名称を入力してください";
-    if (Array.from(trimmed).length > CATEGORY_NAME_MAX) return `名称は${CATEGORY_NAME_MAX}文字以内にしてください`;
+    if (Array.from(trimmed).length > ITEM_NAME_MAX) return `名称は${ITEM_NAME_MAX}文字以内にしてください`;
     if (!abbrIsOneChar(abbr)) return "略称は1文字にしてください";
-    if (isDuplicateName(trimmed, group, categories.all, target?.id)) return "同じグループに同じ名称があります";
+    if (isDuplicateItemName(trimmed, kind, habits.all, target?.id)) return "同じ種類に同じ名称があります";
+    if (overLimit) return `${KIND_LABEL[kind]}で使う項目は${ITEM_ACTIVE_MAX}つまでです`;
     return null;
   })();
 
@@ -62,12 +74,8 @@ export function CategoryEdit() {
     setBusy(true);
     setError(null);
     try {
-      if (isNew) await addCategory(uid, { name: trimmed, abbr, group }, categories.all);
-      else if (target) {
-        // グループを移したら、移った先の末尾に置く（元の order のままだと、移った先で順番が重なる）
-        const moved = group === target.group ? {} : { order: nextOrder(categories.all, group) };
-        await updateCategory(uid, target.id, { name: trimmed, abbr, group, active, ...moved });
-      }
+      if (isNew) await addItem(uid, { kind, name: trimmed, abbr }, habits.all);
+      else if (target) await updateItem(uid, target.id, { name: trimmed, abbr, active });
       toast(isNew ? "追加しました" : "保存しました");
       back();
     } catch (e) {
@@ -75,6 +83,8 @@ export function CategoryEdit() {
       setBusy(false);
     }
   }
+
+  const ink = target ? inkOf(target, habits.all) : kind === "keep" ? "vegetable" : "other";
 
   return (
     <div className="screen">
@@ -84,7 +94,7 @@ export function CategoryEdit() {
             キャンセル
           </button>
         }
-        title={isNew ? "カテゴリを追加" : "カテゴリ編集"}
+        title={isNew ? `${KIND_LABEL[kind]}を追加` : "項目の編集"}
       />
       <div className="paper">
         <div className="main pad" style={{ paddingLeft: 16, paddingRight: 16 }}>
@@ -93,22 +103,26 @@ export function CategoryEdit() {
           ) : (
             <>
               <div className="frow">
-                <label htmlFor="cat-name">名称</label>
+                <span>種類</span>
+                <span>{KIND_LABEL[kind]}</span>
+              </div>
+              <div className="frow">
+                <label htmlFor="item-name">名称</label>
                 <input
-                  id="cat-name"
+                  id="item-name"
                   className="inp"
                   type="text"
                   value={name}
-                  maxLength={CATEGORY_NAME_MAX}
+                  maxLength={ITEM_NAME_MAX}
                   autoComplete="off"
                   onChange={(e) => onNameChange(e.target.value)}
                 />
               </div>
               <div className="frow">
-                <label htmlFor="cat-abbr">略称（1文字）</label>
+                <label htmlFor="item-abbr">略称（1文字）</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <input
-                    id="cat-abbr"
+                    id="item-abbr"
                     className="inp abbr"
                     type="text"
                     value={abbr}
@@ -120,26 +134,11 @@ export function CategoryEdit() {
                     }}
                   />
                   {abbrIsOneChar(abbr) && (
-                    <span className={`t g-${group}`} aria-hidden="true">
+                    <span className={`t g-${ink}`} aria-hidden="true">
                       {abbr}
                     </span>
                   )}
                 </div>
-              </div>
-              <div className="frow">
-                <label htmlFor="cat-group">グループ</label>
-                <select
-                  id="cat-group"
-                  className="inp"
-                  value={group}
-                  onChange={(e) => setGroup(e.target.value as GroupId)}
-                >
-                  {GROUPS.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.label}
-                    </option>
-                  ))}
-                </select>
               </div>
               {!isNew && (
                 <div className="frow">

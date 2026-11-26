@@ -1,13 +1,13 @@
 # ひびログ
 
-食事と便を数タップで記録し、カレンダーで振り返るための個人用 PWA。
+減らしたい食べ物（パン・お菓子）を食べた日と運動した日を判子で残し、月カレンダーと連続日数で習慣の改善に伴走する個人用 PWA。便の記録もあわせて続ける。
 設計の経緯と決定は [docs/](docs/) にある（01 Strategy → 06 技術選定、wireframes.html）。
 
 ## 構成
 
 - React 19 + TypeScript + Vite、PWA（vite-plugin-pwa）
 - Firebase：Authentication（メール／パスワード）、Cloud Firestore、Hosting
-- データは `users/{uid}/{categories,meals,stools}`。アクセス制限は `firestore.rules`
+- データは `users/{uid}/{items,marks,meta,stools}`。初版の `categories`・`meals` は読み取りのみで残している。アクセス制限は `firestore.rules`
 
 ## 開発
 
@@ -22,7 +22,7 @@ npm run check                # 整形・lint・型チェック（vp check。--fi
 npm run markuplint           # HTML・JSX の lint
 npm run stylelint            # CSS の lint（-- --fix で自動修正）
 npm run fmt                  # 整形（oxfmt）
-npm test                     # 単体テスト（日付・カテゴリの関数、Node の版の一致）
+npm test                     # 単体テスト（日付・数字・項目の関数、配色、Node の版の一致）
 npm run test:rules           # firestore.rules のテスト（Firestore エミュレーターで実行。Java 21 以上が必要）
 npm run test:e2e             # 画面の E2E テスト（Playwright。例データの画面を Chromium と WebKit で操作）
 npm run test:e2e:ui          # 同上を、操作の様子を見ながら実行
@@ -61,7 +61,7 @@ firebase deploy --only firestore
 npm run deploy
 ```
 
-初回ログイン時にカテゴリが空なら、初期の26種が自動で作成される。
+初回ログイン時に項目が空なら、初期の3つ（パン、お菓子、運動）が自動で作成される。初版の食事記録があれば、第2版で初めて起動したときに、パン・お菓子を含む日が記録として引き継がれる（docs/06-tech.md 10章）。
 
 ## Node のバージョン
 

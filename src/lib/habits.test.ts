@@ -6,6 +6,7 @@ import {
   countLastMonthSoFar,
   countThisMonth,
   doneStreak,
+  lastMonthLabel,
 } from "./habits";
 
 const set = (...days: string[]) => new Set(days);
@@ -69,5 +70,17 @@ describe("続けたいことの連続日数", () => {
   test("自己ベスト", () => {
     expect(bestDoneStreak(set("2026-10-30", "2026-10-31", "2026-11-01", "2026-11-05"))).toBe(3);
     expect(bestDoneStreak(set())).toBe(0);
+  });
+});
+
+describe("先月との比較の見出し", () => {
+  test("先月の同じ日まで", () => {
+    expect(lastMonthLabel("2026-11-26")).toBe("先月26日まで");
+  });
+
+  test("先月に同じ日がなければ先月末まで", () => {
+    expect(lastMonthLabel("2026-03-31")).toBe("先月末まで");
+    expect(lastMonthLabel("2026-12-30")).toBe("先月末まで");
+    expect(lastMonthLabel("2026-12-29")).toBe("先月29日まで");
   });
 });

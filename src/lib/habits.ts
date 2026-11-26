@@ -87,3 +87,10 @@ export function bestDoneStreak(done: ReadonlySet<DateKey>): number {
   }
   return best;
 }
+
+/** 先月との比較の見出し（Scope Q61）。「先月26日まで」、先月に同じ日がなければ「先月末まで」。 */
+export function lastMonthLabel(today: DateKey): string {
+  const t = fromKey(today);
+  const lastEnd = endOfMonth(subMonths(t, 1)).getDate();
+  return t.getDate() >= lastEnd ? "先月末まで" : `先月${t.getDate()}日まで`;
+}

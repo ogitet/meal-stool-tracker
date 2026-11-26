@@ -13,7 +13,7 @@ for (const { colorScheme, ground, paper, themeColor } of cases) {
     test("端末の設定に合わせた色で表示する", async ({ page }) => {
       await page.goto("/");
       await expect(page.locator(".screen")).toHaveCSS("background-color", ground);
-      await expect(page.locator(".slip.today")).toHaveCSS("background-color", paper);
+      await expect(page.locator(".mc.today")).toHaveCSS("background-color", paper);
       await expect(page.locator(`meta[name="theme-color"][media*="${colorScheme}"]`)).toHaveAttribute(
         "content",
         themeColor,

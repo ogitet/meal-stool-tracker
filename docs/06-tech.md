@@ -296,10 +296,10 @@ Scope Q14 により、オフラインでも記録できる（2026-11-16 変更�
 
 | 対象 | 方針 |
 |---|---|
-| データ層 | `src/data/items.ts`、`src/data/marks.ts`、`src/data/habitsMeta.ts`（引き継ぎを含む）を足し、同名の `src/demo/*` を用意する。`src/demo/vite-plugin.ts` の差し替え対象に加える |
+| データ層 | `src/data/habits.ts`（項目・記録・設定の購読、記録の押す／取り消す、項目の追加・変更、引き継ぎ）を足し、同名の `src/demo/habits.ts` を用意する。`src/demo/vite-plugin.ts` の差し替え対象に加える |
 | 数字の計算 | `src/lib/habits.ts`（試作で作成済み、単体テストあり） |
-| 削除するもの | `src/screens/MealForm.tsx`、`Stats.tsx`、`CategoryList.tsx`、`CategoryEdit.tsx`、`src/data/meals.ts` の書き込み、週表示。E2E とストーリーも合わせて直す |
-| 試作 | `src/demo/proto/` は、本実装で S-02 に置き換えた後に消す |
+| 削除するもの | `src/screens/MealForm.tsx`、`Stats.tsx`、`CategoryList.tsx`、`CategoryEdit.tsx`、`DayDetail.tsx`、`src/data/meals.ts`・`categories.ts`、週表示。E2E とストーリーも合わせて直す |
+| 試作 | `src/demo/proto/` は、本実装で S-02 に置き換えたため消した |
 
 ### 判断事項
 

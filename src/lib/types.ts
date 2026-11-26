@@ -1,31 +1,9 @@
-export type GroupId = "staple" | "protein" | "vegetable" | "other" | "sweets";
-export type Slot = "breakfast" | "lunch" | "dinner" | "other";
 export type Shape = "hard" | "normal" | "soft" | "diarrhea";
 export type Amount = "small" | "normal" | "large";
 export type Feeling = "clear" | "residual";
 
 /** 暦日。"2026-11-10" 形式（端末のローカル時刻基準）。 */
 export type DateKey = string;
-
-export interface Category {
-  id: string;
-  name: string;
-  abbr: string;
-  group: GroupId;
-  active: boolean;
-  order: number;
-}
-
-export interface Meal {
-  id: string;
-  date: DateKey;
-  slot: Slot;
-  categoryIds: string[];
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  /** 端末に保存済みで、まだサーバーに届いていない（未同期） */
-  pending?: boolean;
-}
 
 export interface Stool {
   id: string;
@@ -38,10 +16,10 @@ export interface Stool {
   pending?: boolean;
 }
 
-/** 減らしたいもの（reduce）と続けたいこと（keep）。各1つで固定（Scope 第2版 Q59）。 */
+/** 減らしたいもの（reduce）と続けたいこと（keep）。各1つで固定（Scope Q59）。 */
 export type HabitKind = "reduce" | "keep";
 
-/** 減らしたいもの・続けたいことの項目（Scope 第2版 F-15）。 */
+/** 減らしたいもの・続けたいことの項目（Scope F-15）。 */
 export interface HabitItem {
   id: string;
   kind: HabitKind;
@@ -52,8 +30,17 @@ export interface HabitItem {
   order: number;
 }
 
-/** 「その日にその項目が起きた」の記録。同じ日の同じ項目は1件（Scope 第2版 Q51）。 */
+/** 「その日にその項目が起きた」の記録。同じ日の同じ項目は1件（Scope Q51）。 */
 export interface Mark {
   date: DateKey;
   itemId: string;
+  /** 端末に保存済みで、まだサーバーに届いていない（未同期） */
+  pending?: boolean;
+}
+
+/** 期間の読み込みの状態。 */
+export interface RangeState<T> {
+  items: T[];
+  loading: boolean;
+  error: string | null;
 }

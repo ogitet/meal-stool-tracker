@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { toKey } from "@/lib/date";
-import type { Amount, DateKey, Feeling, Shape, Stool } from "@/lib/types";
-import type { RangeState } from "./meals";
+import type { Amount, DateKey, Feeling, RangeState, Shape, Stool } from "@/lib/types";
 import { accept, newId, pendingIds, store, useStoreVersion } from "./store";
 
 export function useStoolsInRange(_uid: string, start: DateKey, end: DateKey): RangeState<Stool> {

@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "ひびログ",
         short_name: "ひびログ",
-        description: "食事と便の記録",
+        description: "食べたもの・運動・便の記録",
         lang: "ja",
         start_url: "/",
         display: "standalone",
